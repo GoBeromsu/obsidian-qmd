@@ -1,0 +1,92 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  formatSnippet,
+  parseCollectionList,
+  parseCollectionShow,
+  parseSearchResults,
+  toVaultRelativePath,
+  validateStructuredQueryDocument,
+} from '../../src/qmd/parser';
+
+describe('qmd parser helpers', () => {
+  it('parses collection list output', () => {
+    const stdout = [
+      'Collections (2):',
+      '',
+      'obsidian (qmd://obsidian/)',
+      '  Pattern:  **/*.md',
+      '',
+      'docs (qmd://docs/)',
+      '  Pattern:  **/*.md',
+    ].join('\n');
+
+    expect(parseCollectionList(stdout)).toEqual(['obsidian', 'docs']);
+  });
+
+  it('parses collection show output', () => {
+    const stdout = [
+      'Collection: obsidian',
+      '  Path:     /Users/test/Vault',
+      '  Pattern:  **/*.md',
+      '  Include:  yes (default)',
+      '  Contexts: 5',
+    ].join('\n');
+
+    expect(parseCollectionShow(stdout)).toEqual({
+      name: 'obsidian',
+      path: '/Users/test/Vault',
+      pattern: '**/*.md',
+      include: 'yes (default)',
+      contexts: 5,
+    });
+  });
+
+  it('parses qmd json search results', () => {
+    const stdout = JSON.stringify([
+      {
+        docid: '#abc123',
+        score: 0.91,
+        file: 'qmd://obsidian/folder/note.md',
+        title: 'Note',
+        snippet: '@@ -1,2 @@\n\nHello world',
+      },
+    ]);
+
+    expect(parseSearchResults(stdout)).toEqual([
+      {
+        docid: '#abc123',
+        score: 0.91,
+        file: 'qmd://obsidian/folder/note.md',
+        title: 'Note',
+        snippet: '@@ -1,2 @@\n\nHello world',
+      },
+    ]);
+  });
+
+  it('maps qmd virtual paths back to vault-relative paths', () => {
+    expect(toVaultRelativePath('qmd://obsidian/folder/note.md', 'obsidian')).toBe('folder/note.md');
+    expect(toVaultRelativePath('qmd://docs/folder/note.md', 'obsidian')).toBeNull();
+  });
+
+  it('formats snippets for display', () => {
+    expect(formatSnippet('@@ -1,2 @@\n\nHello   world')).toBe('Hello world');
+  });
+
+  it('validates structured query documents', () => {
+    expect(validateStructuredQueryDocument('intent: related\nlex: auth\nvec: login flow')).toEqual({
+      valid: true,
+      normalized: 'intent: related\nlex: auth\nvec: login flow',
+    });
+
+    expect(validateStructuredQueryDocument('intent: related')).toEqual({
+      valid: false,
+      error: 'intent: cannot be the only line.',
+    });
+
+    expect(validateStructuredQueryDocument('plain text\nvec: auth')).toEqual({
+      valid: false,
+      error: 'Each line must start with lex:, vec:, hyde:, or intent:.',
+    });
+  });
+});

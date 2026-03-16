@@ -1,0 +1,40 @@
+{
+	"name": "obsidian-qmd",
+	"version": "1.0.1",
+	"description": "Obsidian wrapper for local QMD search, related notes, and autosync.",
+	"main": "main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "node scripts/dev.mjs",
+		"dev:build": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"test": "vitest run",
+		"ci": "pnpm run build && pnpm run lint && pnpm run test",
+		"version": "node scripts/version.mjs",
+		"sync:plugins": "node scripts/sync-to-plugins.mjs",
+		"postversion": "git push && git push --tags",
+		"release:patch": "pnpm lint:fix && pnpm version patch",
+		"release:minor": "pnpm lint:fix && pnpm version minor",
+		"release:major": "pnpm lint:fix && pnpm version major"
+	},
+	"keywords": [],
+	"author": "Beomsu Koh",
+	"license": "MIT",
+	"devDependencies": {
+		"@eslint/js": "^8.57.1",
+		"@types/node": "^20.0.0",
+		"@typescript-eslint/eslint-plugin": "5.29.0",
+		"@typescript-eslint/parser": "5.29.0",
+		"builtin-modules": "3.3.0",
+		"esbuild": "^0.25.0",
+		"eslint": "^8.47.0",
+		"globals": "^15.15.0",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "^5.0.0",
+		"typescript-eslint": "^8.0.0",
+		"vitest": "^2.0.0"
+	}
+}

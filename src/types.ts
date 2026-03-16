@@ -1,0 +1,47 @@
+export type QmdSearchMode = 'keyword' | 'semantic' | 'hybrid' | 'advanced';
+export type QmdOpenTarget = 'current' | 'tab' | 'split';
+
+export interface QmdSearchResult {
+  docid: string;
+  score: number;
+  file: string;
+  title: string;
+  snippet: string;
+}
+
+export interface QmdCollectionInfo {
+  name: string;
+  path: string;
+  pattern?: string;
+  include?: string;
+  contexts?: number;
+}
+
+export type SyncPhase = 'idle' | 'syncing' | 'embedding' | 'error';
+
+export interface SyncState {
+  phase: SyncPhase;
+  message: string;
+  error?: string;
+}
+
+export interface QmdPluginSettings {
+  qmdExecutablePath: string;
+  collectionOverride: string;
+  defaultSearchMode: QmdSearchMode;
+  lastSearchMode: QmdSearchMode;
+  previewResultLimit: number;
+  relatedResultLimit: number;
+  autoSyncEnabled: boolean;
+  autoSyncDebounceMs: number;
+  persistLastMode: boolean;
+  showSyncStatusBar: boolean;
+}
+
+export interface RelatedQuerySource {
+  title: string;
+  aliases: string[];
+  tags: string[];
+  headings: string[];
+  body: string;
+}
