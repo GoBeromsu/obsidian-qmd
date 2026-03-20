@@ -43,5 +43,9 @@ export interface RelatedQuerySource {
   aliases: string[];
   tags: string[];
   headings: string[];
-  body: string;
+}
+
+export interface CachedRelatedResult {
+  results: QmdSearchResult[];
+  timestamp: number;
 }

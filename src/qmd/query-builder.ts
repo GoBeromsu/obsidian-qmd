@@ -17,37 +17,13 @@ function unique(values: string[], limit: number): string[] {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))].slice(0, limit);
 }
 
-function stripFrontmatter(content: string): string {
-  if (!content.startsWith('---\n')) {
-    return content;
-  }
-
-  const end = content.indexOf('\n---', 4);
-  if (end === -1) {
-    return content;
-  }
-
-  return content.slice(end + 4);
-}
-
-function normalizeBody(content: string, maxLength: number): string {
-  return stripFrontmatter(content)
-    .replace(/`{3}[\s\S]*?`{3}/g, ' ')
-    .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
-    .replace(/\[[^\]]+]\([^)]+\)/g, ' ')
-    .replace(/[#>*_`-]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, maxLength);
-}
-
 function formatLexTerm(value: string): string {
   return /\s/.test(value) ? `"${value}"` : value;
 }
 
 export function buildRelatedQuerySource(
   filePath: string,
-  content: string,
+  _content: string,
   metadata?: CachedMetadata | null,
 ): RelatedQuerySource {
   const rawTitle = filePath.split('/').pop()?.replace(/\.md$/, '') ?? filePath;
@@ -64,7 +40,6 @@ export function buildRelatedQuerySource(
     aliases: aliasValues,
     tags: tagValues,
     headings: headingValues,
-    body: normalizeBody(content, 650),
   };
 }
 
@@ -76,18 +51,32 @@ export function buildRelatedQueryDocument(source: RelatedQuerySource): string {
     ...source.headings,
   ], 12).map(formatLexTerm);
 
+  const topicTerms = unique([...source.tags, ...source.headings], 3);
+
   const vecParts = [
-    `Note title: ${source.title}.`,
-    source.aliases.length ? `Aliases: ${source.aliases.join(', ')}.` : '',
-    source.headings.length ? `Headings: ${source.headings.join(', ')}.` : '',
-    source.body,
+    `Notes about ${source.title}.`,
+    source.tags.length ? `Topics: ${source.tags.join(', ')}.` : '',
+    source.headings.length ? `Sections: ${source.headings.join(', ')}.` : '',
   ].filter(Boolean);
 
-  const lines = ['intent: related notes for the open note'];
+  const hydeParts = [
+    `A note that discusses ${source.title} topics`,
+    source.tags.length ? `including ${source.tags.join(', ')}` : '',
+    source.headings.length ? `with sections on ${source.headings.join(', ')}` : '',
+  ].filter(Boolean);
+
+  const intentSuffix = topicTerms.length > 0 ? ` covering ${topicTerms.join(', ')}` : '';
+
+  const lines: string[] = [
+    `intent: find notes related to ${source.title}${intentSuffix}`,
+  ];
+
   if (lexTerms.length > 0) {
     lines.push(`lex: ${lexTerms.join(' ')}`);
   }
+
   lines.push(`vec: ${vecParts.join(' ')}`);
+  lines.push(`hyde: ${hydeParts.join(' ')}`);
 
   return lines.join('\n');
 }

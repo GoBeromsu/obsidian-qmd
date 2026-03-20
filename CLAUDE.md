@@ -15,10 +15,10 @@ pnpm build          # tsc type-check + production esbuild build
 pnpm test           # Vitest unit tests
 pnpm lint           # ESLint
 pnpm lint:fix       # ESLint with auto-fix
-pnpm ci             # build + lint + test
-pnpm release:patch  # lint:fix → patch bump → auto-push tag
-pnpm release:minor  # lint:fix → minor bump → auto-push tag
-pnpm release:major  # lint:fix → major bump → auto-push tag
+pnpm run ci         # build + lint + test
+pnpm release:patch  # run CI → patch bump → auto-push tag
+pnpm release:minor  # run CI → minor bump → auto-push tag
+pnpm release:major  # run CI → major bump → auto-push tag
 pnpm sync:plugins   # propagate template changes to downstream plugins
 ```
 
@@ -50,8 +50,8 @@ boiler.config.mjs     # Per-repo config (dev deploy, version staging, CI, releas
 
 ## Release
 
-1. `pnpm ci` — MUST pass (build + lint + test)
-2. `pnpm release:patch|minor|major` — lint:fix, version bump, auto-push tag (via `postversion`)
+1. `pnpm run ci` — MUST pass (build + lint + test)
+2. `pnpm release:patch|minor|major` — run CI, version bump, auto-push tag (via `postversion`)
 3. GitHub Actions handles CI + Release workflows (`ci.yml`, `release.yml`)
 
 **DENIED by settings.json:** `git tag`, `git push --tags`, `gh release` — only `pnpm release:*` is allowed.

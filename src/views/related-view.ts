@@ -1,14 +1,21 @@
 import { type HoverPopover, ItemView, Notice, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
-import type { QmdSearchResult } from '../types';
+import type { CachedRelatedResult, QmdSearchResult } from '../types';
 import { renderResultItem } from '../ui/result-renderer';
 
 export const QMD_RELATED_VIEW_TYPE = 'qmd-related-view';
+
+const CACHE_MAX_SIZE = 20;
+const CACHE_TTL_MS = 60_000;
+const FILE_OPEN_DEBOUNCE_MS = 300;
 
 export class QmdRelatedView extends ItemView {
 	hoverPopover: HoverPopover | null = null;
 	private container!: HTMLDivElement;
 	private requestTicket = 0;
+	private fileOpenTimer: number | null = null;
+	private readonly cache = new Map<string, CachedRelatedResult>();
+	private showingCached = false;
 
 	constructor(leaf: WorkspaceLeaf, private readonly plugin: QmdPlugin) {
 		super(leaf);
@@ -52,7 +59,7 @@ export class QmdRelatedView extends ItemView {
 
 		this.registerEvent(
 			this.app.workspace.on('file-open', () => {
-				void this.renderView();
+				this.debouncedRenderView();
 			}),
 		);
 
@@ -60,30 +67,45 @@ export class QmdRelatedView extends ItemView {
 	}
 
 	async onClose(): Promise<void> {
+		if (this.fileOpenTimer) {
+			window.clearTimeout(this.fileOpenTimer);
+			this.fileOpenTimer = null;
+		}
 		this.container?.empty();
 	}
 
-	async renderView(): Promise<void> {
+	async renderView(force = false): Promise<void> {
 		if (!this.container) {
 			return;
 		}
 
 		const activeFile = this.app.workspace.getActiveFile();
 		const ticket = ++this.requestTicket;
+		this.showingCached = false;
 		this.renderShell(activeFile);
 
 		if (!(activeFile instanceof TFile) || activeFile.extension !== 'md') {
-			this.renderEmpty('Open a markdown note to see related results.');
+			this.renderEmpty('Open a markdown note to see related results.', 'file-text');
 			return;
 		}
 
 		const setupMessage = this.plugin.getSetupMessage();
 		if (setupMessage) {
-			this.renderEmpty(setupMessage);
+			this.renderEmpty(setupMessage, 'alert-circle');
 			return;
 		}
 
-		this.renderLoading('Finding related notes...');
+		if (!force) {
+			const cached = this.getCached(activeFile);
+			if (cached) {
+				this.showingCached = true;
+				this.renderShell(activeFile);
+				this.renderResults(activeFile, cached.results);
+				return;
+			}
+		}
+
+		this.renderSkeleton();
 
 		try {
 			const results = await this.plugin.findRelatedNotes(activeFile);
@@ -91,6 +113,8 @@ export class QmdRelatedView extends ItemView {
 				return;
 			}
 
+			this.setCache(activeFile, results);
+			this.renderShell(activeFile);
 			this.renderResults(activeFile, results);
 		} catch (error) {
 			if (ticket !== this.requestTicket) {
@@ -98,7 +122,57 @@ export class QmdRelatedView extends ItemView {
 			}
 
 			const message = error instanceof Error ? error.message : String(error);
-			this.renderEmpty(message);
+			this.renderShell(activeFile);
+			this.renderEmpty(message, 'alert-circle');
+		}
+	}
+
+	private debouncedRenderView(): void {
+		if (this.fileOpenTimer) {
+			window.clearTimeout(this.fileOpenTimer);
+		}
+
+		this.fileOpenTimer = window.setTimeout(() => {
+			this.fileOpenTimer = null;
+			void this.renderView();
+		}, FILE_OPEN_DEBOUNCE_MS);
+	}
+
+	private getCacheKey(file: TFile): string {
+		return `${file.path}:${file.stat.mtime}`;
+	}
+
+	private getCached(file: TFile): CachedRelatedResult | null {
+		const key = this.getCacheKey(file);
+		const entry = this.cache.get(key);
+		if (!entry) {
+			return null;
+		}
+
+		if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+			this.cache.delete(key);
+			return null;
+		}
+
+		return entry;
+	}
+
+	private setCache(file: TFile, results: QmdSearchResult[]): void {
+		const key = this.getCacheKey(file);
+		this.cache.set(key, { results, timestamp: Date.now() });
+
+		if (this.cache.size > CACHE_MAX_SIZE) {
+			let oldestKey: string | null = null;
+			let oldestTime = Infinity;
+			for (const [k, v] of this.cache) {
+				if (v.timestamp < oldestTime) {
+					oldestTime = v.timestamp;
+					oldestKey = k;
+				}
+			}
+			if (oldestKey) {
+				this.cache.delete(oldestKey);
+			}
 		}
 	}
 
@@ -111,33 +185,52 @@ export class QmdRelatedView extends ItemView {
 			text: file?.basename ?? 'No active note',
 		});
 
-		const refreshBtn = header.createEl('button', {
+		const actions = header.createDiv({ cls: 'qmd-related-actions' });
+
+		if (this.showingCached) {
+			const cachedEl = actions.createSpan({ cls: 'qmd-related-cached' });
+			const iconEl = cachedEl.createSpan();
+			setIcon(iconEl, 'clock');
+			cachedEl.createSpan({ text: 'cached' });
+		}
+
+		const refreshBtn = actions.createEl('button', {
 			cls: 'clickable-icon',
 			attr: { 'aria-label': 'Refresh related notes', type: 'button' },
 		});
 		setIcon(refreshBtn, 'refresh-cw');
 		refreshBtn.addEventListener('click', () => {
-			void this.renderView();
+			void this.renderView(true);
 		});
 	}
 
-	private renderLoading(message: string): void {
-		const stateEl = this.container.createDiv({ cls: 'qmd-state' });
-		stateEl.createDiv({ cls: 'qmd-spinner' });
-		stateEl.createEl('p', { cls: 'qmd-state-text', text: message });
+	private renderSkeleton(): void {
+		const skeletonEl = this.container.createDiv({ cls: 'qmd-skeleton-container' });
+		for (let i = 0; i < 4; i++) {
+			const row = skeletonEl.createDiv({ cls: 'qmd-skeleton-row' });
+			row.createDiv({ cls: 'qmd-skeleton-bar' });
+			const body = row.createDiv({ cls: 'qmd-skeleton-body' });
+			body.createDiv({ cls: 'qmd-skeleton-title' });
+			body.createDiv({ cls: 'qmd-skeleton-snippet' });
+		}
 	}
 
-	private renderEmpty(message: string): void {
+	private renderEmpty(message: string, icon: string): void {
 		const stateEl = this.container.createDiv({ cls: 'qmd-state' });
 		const iconEl = stateEl.createDiv({ cls: 'qmd-state-icon' });
-		setIcon(iconEl, 'search-x');
+		setIcon(iconEl, icon);
 		stateEl.createEl('p', { cls: 'qmd-state-text', text: message });
 	}
 
 	private renderResults(file: TFile, results: QmdSearchResult[]): void {
 		if (results.length === 0) {
-			this.renderEmpty(`No related notes for ${file.basename}.`);
+			this.renderEmpty(`No related notes for ${file.basename}.`, 'search-x');
 			return;
+		}
+
+		const countEl = this.container.querySelector('.qmd-related-filename');
+		if (countEl) {
+			countEl.textContent = `${file.basename} (${results.length})`;
 		}
 
 		const list = this.container.createDiv({

@@ -31,22 +31,49 @@ describe('related query builder', () => {
     expect(source.aliases).toEqual(['Alternate Name']);
     expect(source.tags).toEqual(['writing', 'obsidian']);
     expect(source.headings).toEqual(['Heading']);
-    expect(source.body).toContain('Body text with enough detail');
-    expect(source.body).not.toContain('aliases');
+    expect(source).not.toHaveProperty('body');
   });
 
-  it('builds a structured qmd query document for related notes', () => {
+  it('builds a structured qmd query document with intent, lex, vec, and hyde', () => {
     const query = buildRelatedQueryDocument({
       title: 'My Note',
       aliases: ['Alternate Name'],
       tags: ['obsidian'],
       headings: ['Heading One'],
-      body: 'Useful body excerpt.',
     });
 
-    expect(query).toContain('intent: related notes for the open note');
+    expect(query).toContain('intent: find notes related to My Note covering obsidian, Heading One');
     expect(query).toContain('lex: "My Note" "Alternate Name" obsidian "Heading One"');
-    expect(query).toContain('vec: Note title: My Note.');
-    expect(query).toContain('Useful body excerpt.');
+    expect(query).toContain('vec: Notes about My Note. Topics: obsidian. Sections: Heading One.');
+    expect(query).toContain('hyde: A note that discusses My Note topics including obsidian with sections on Heading One');
+  });
+
+  it('handles source with no tags or headings', () => {
+    const query = buildRelatedQueryDocument({
+      title: 'Simple Note',
+      aliases: [],
+      tags: [],
+      headings: [],
+    });
+
+    expect(query).toContain('intent: find notes related to Simple Note');
+    expect(query).toContain('lex: "Simple Note"');
+    expect(query).toContain('vec: Notes about Simple Note.');
+    expect(query).toContain('hyde: A note that discusses Simple Note topics');
+    expect(query).not.toContain('Topics:');
+    expect(query).not.toContain('Sections:');
+  });
+
+  it('limits topic terms in intent to 3', () => {
+    const query = buildRelatedQueryDocument({
+      title: 'Big Note',
+      aliases: [],
+      tags: ['alpha', 'beta', 'gamma', 'delta'],
+      headings: ['epsilon', 'zeta'],
+    });
+
+    const intentLine = query.split('\n').find((line) => line.startsWith('intent:'));
+    expect(intentLine).toContain('covering alpha, beta, gamma');
+    expect(intentLine).not.toContain('delta');
   });
 });

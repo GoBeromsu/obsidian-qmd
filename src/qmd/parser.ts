@@ -97,11 +97,69 @@ export function toVaultRelativePath(value: string, collectionName: string): stri
   return parsed.relativePath;
 }
 
+const FRONTMATTER_KEY_RE = /^(?:aliases|tags|date_created|date_modified|cssclasses|publish|file_class|up|related|source|author|status|type|category|rating|title|description|created|modified|updated|permalink|banner|cover|image|draft|lang|weight|slug|template|parent|children|prev|next|sidebar_position|hide_table_of_contents)\s*:/i;
+
 export function formatSnippet(snippet: string): string {
   return snippet
     .replace(/^@@.*$/gm, '')
+    .replace(/^---[\s\S]*?---/m, '')
+    .replace(/^---\s*$/gm, '')
+    .split('\n')
+    .filter((line) => !FRONTMATTER_KEY_RE.test(line.trim()))
+    .join('\n')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+const STOP_WORDS = new Set([
+  'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had',
+  'her', 'was', 'one', 'our', 'out', 'has', 'have', 'been', 'some', 'them',
+  'than', 'its', 'over', 'such', 'that', 'this', 'with', 'will', 'each',
+  'from', 'they', 'into', 'also', 'more', 'other', 'which', 'their', 'about',
+]);
+
+export function extractQueryTerms(query: string): string[] {
+  const words = query
+    .replace(/^(lex|vec|hyde|intent):\s*/gim, ' ')
+    .replace(/["""[\](){}]/g, ' ')
+    .split(/\s+/)
+    .map((word) => word.trim().toLowerCase())
+    .filter((word) => word.length >= 3 && !STOP_WORDS.has(word));
+
+  return [...new Set(words)];
+}
+
+export function highlightSnippet(snippet: string, queryTerms: string[]): DocumentFragment {
+  const fragment = document.createDocumentFragment();
+
+  if (queryTerms.length === 0) {
+    fragment.appendChild(document.createTextNode(snippet));
+    return fragment;
+  }
+
+  const escaped = queryTerms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const pattern = new RegExp(`\\b(${escaped.join('|')})`, 'gi');
+
+  let lastIndex = 0;
+  for (;;) {
+    const match = pattern.exec(snippet); // RegExp.exec, not child_process
+    if (!match) break;
+
+    if (match.index > lastIndex) {
+      fragment.appendChild(document.createTextNode(snippet.slice(lastIndex, match.index)));
+    }
+
+    const mark = document.createElement('mark');
+    mark.textContent = match[0];
+    fragment.appendChild(mark);
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < snippet.length) {
+    fragment.appendChild(document.createTextNode(snippet.slice(lastIndex)));
+  }
+
+  return fragment;
 }
 
 export function validateStructuredQueryDocument(input: string): { valid: boolean; normalized?: string; error?: string } {
