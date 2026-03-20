@@ -12,6 +12,7 @@
 		"lint:fix": "eslint . --fix",
 		"test": "vitest run",
 		"ci": "pnpm run build && pnpm run lint && pnpm run test",
+		"prepare": "husky",
 		"version": "node scripts/version.mjs",
 		"sync:plugins": "node scripts/sync-to-plugins.mjs",
 		"postversion": "git push && git push --tags",
@@ -24,6 +25,8 @@
 	"license": "MIT",
 	"packageManager": "pnpm@10.32.1",
 	"devDependencies": {
+		"@commitlint/cli": "^19.0.0",
+		"@commitlint/config-conventional": "^19.0.0",
 		"@eslint/js": "^8.57.1",
 		"@types/node": "^20.0.0",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
@@ -32,10 +35,15 @@
 		"esbuild": "^0.25.0",
 		"eslint": "^8.47.0",
 		"globals": "^15.15.0",
+		"husky": "^9.0.0",
+		"lint-staged": "^15.0.0",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
 		"vitest": "^2.0.0"
+	},
+	"lint-staged": {
+		"src/**/*.ts": ["eslint --fix"]
 	}
 }
