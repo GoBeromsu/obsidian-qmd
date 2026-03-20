@@ -1,6 +1,6 @@
 import type { HoverParent } from 'obsidian';
 import type QmdPlugin from '../main';
-import { formatSnippet } from '../qmd/parser';
+import { extractQueryTerms, formatSnippet, highlightSnippet } from '../qmd/parser';
 import type { QmdOpenTarget, QmdSearchResult } from '../types';
 import { showResultContextMenu } from './result-actions';
 
@@ -25,6 +25,7 @@ export interface RenderResultOptions {
 	container: HTMLElement;
 	sourceId: string;
 	hoverParent: HoverParent;
+	queryText?: string;
 	onSelect?: (index: number) => void;
 	onOpen?: (index: number, target: QmdOpenTarget) => void;
 }
@@ -68,7 +69,13 @@ export function renderResultItem(opts: RenderResultOptions): HTMLElement {
 
 	const snippet = formatSnippet(result.snippet);
 	if (snippet) {
-		body.createDiv({ cls: 'qmd-result-snippet', text: snippet });
+		const snippetEl = body.createDiv({ cls: 'qmd-result-snippet' });
+		if (opts.queryText) {
+			const terms = extractQueryTerms(opts.queryText);
+			snippetEl.appendChild(highlightSnippet(snippet, terms));
+		} else {
+			snippetEl.textContent = snippet;
+		}
 	}
 
 	// Click

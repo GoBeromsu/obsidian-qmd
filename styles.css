@@ -179,6 +179,14 @@
 	animation: qmd-spin 0.6s linear infinite;
 }
 
+/* Snippet Highlighting */
+.qmd-result-snippet mark {
+	background: color-mix(in srgb, var(--text-accent) 20%, transparent);
+	color: var(--text-normal);
+	border-radius: 2px;
+	padding: 0 1px;
+}
+
 /* Related View */
 .qmd-related-view { padding: 0; }
 .qmd-related-header {
@@ -197,7 +205,58 @@
 	white-space: nowrap;
 	flex: 1;
 }
+.qmd-related-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+.qmd-related-cached {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	font-size: var(--font-smallest);
+	color: var(--text-faint);
+}
+.qmd-related-cached svg { width: 12px; height: 12px; }
 .qmd-related-results { padding: 6px; }
+
+/* Skeleton Loading */
+.qmd-skeleton-container { display: grid; gap: 8px; padding: 6px; }
+.qmd-skeleton-row {
+	display: flex;
+	align-items: stretch;
+	padding: 10px 12px;
+	border-radius: 12px;
+	gap: 10px;
+}
+.qmd-skeleton-bar {
+	width: 3px;
+	border-radius: 2px;
+	background: var(--background-modifier-border);
+	align-self: stretch;
+}
+.qmd-skeleton-body { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.qmd-skeleton-title {
+	height: 14px;
+	width: 60%;
+	border-radius: 4px;
+	background: var(--background-modifier-border);
+	animation: qmd-pulse 1.2s ease-in-out infinite;
+}
+.qmd-skeleton-snippet {
+	height: 10px;
+	width: 85%;
+	border-radius: 4px;
+	background: var(--background-modifier-border);
+	animation: qmd-pulse 1.2s ease-in-out infinite;
+	animation-delay: 0.15s;
+}
+
+@keyframes qmd-pulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
 
 /* Instructions */
 .qmd-search-instructions { justify-content: flex-start; flex-wrap: wrap; padding-top: 4px; gap: 10px; }

@@ -1,4 +1,4 @@
-import { type HoverPopover, Modal, Notice, setIcon } from 'obsidian';
+import { type HoverPopover, MarkdownView, Modal, Notice, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
 import { SEARCH_MODE_LABELS } from '../settings';
 import { validateStructuredQueryDocument } from '../qmd/parser';
@@ -32,6 +32,8 @@ export class QmdSearchModal extends Modal {
 	private resultEls: HTMLElement[] = [];
 	private results: QmdSearchResult[] = [];
 	private selectedIndex = 0;
+	private instructionsEl!: HTMLDivElement;
+	private lastQueryText = '';
 	private dirty = false;
 	private searchTimer: number | null = null;
 	private searchInFlight = false;
@@ -123,12 +125,8 @@ export class QmdSearchModal extends Modal {
 		this.metaEl = contentEl.createDiv({ cls: 'qmd-search-meta' });
 		this.resultsEl = contentEl.createDiv({ cls: 'qmd-search-results' });
 
-		const instructionsEl = contentEl.createDiv({ cls: 'prompt-instructions qmd-search-instructions' });
-		this.createInstruction(instructionsEl, '\u2191\u2193', 'navigate');
-		this.createInstruction(instructionsEl, 'enter', 'open');
-		this.createInstruction(instructionsEl, 'cmd/ctrl+enter', 'new tab');
-		this.createInstruction(instructionsEl, 'alt+enter', 'split');
-		this.createInstruction(instructionsEl, 'tab', 'switch mode');
+		this.instructionsEl = contentEl.createDiv({ cls: 'prompt-instructions qmd-search-instructions' });
+		this.renderInstructions();
 
 		this.queryInputEl.addEventListener('input', () => {
 			this.dirty = true;
@@ -182,6 +180,7 @@ export class QmdSearchModal extends Modal {
 
 		this.plugin.rememberSearchMode(mode);
 		this.renderBanner();
+		this.renderInstructions();
 
 		if (mode === 'advanced') {
 			this.advancedInputEl.focus();
@@ -255,7 +254,19 @@ export class QmdSearchModal extends Modal {
 			return;
 		}
 
+		if (event.key === 'o' && event.altKey && this.canOpenSelectedResult()) {
+			event.preventDefault();
+			void this.openSelectedResult('current', true);
+			return;
+		}
+
 		if (this.handleNavigationShortcut(event)) {
+			return;
+		}
+
+		if (event.key === 'Enter' && event.shiftKey && this.canOpenSelectedResult()) {
+			event.preventDefault();
+			this.insertWikilinkForSelectedResult();
 			return;
 		}
 
@@ -356,6 +367,8 @@ export class QmdSearchModal extends Modal {
 			this.searchTimer = null;
 		}
 
+		this.lastQueryText = query;
+
 		let normalizedQuery = query;
 		if (this.mode === 'advanced') {
 			const validation = validateStructuredQueryDocument(query);
@@ -444,6 +457,7 @@ export class QmdSearchModal extends Modal {
 				container: this.resultsEl,
 				sourceId: 'qmd-search-modal',
 				hoverParent: this,
+				queryText: this.lastQueryText,
 				onSelect: (i) => {
 					this.selectedIndex = i;
 					this.refreshSelection();
@@ -468,14 +482,16 @@ export class QmdSearchModal extends Modal {
 		stateEl.createEl('p', { cls: 'qmd-state-text', text: message });
 	}
 
-	private async openSelectedResult(target: QmdOpenTarget = 'current'): Promise<void> {
+	private async openSelectedResult(target: QmdOpenTarget = 'current', keepOpen = false): Promise<void> {
 		const result = this.results[this.selectedIndex];
 		if (!result) {
 			return;
 		}
 
 		await this.plugin.openSearchResult(result, target);
-		this.close();
+		if (!keepOpen) {
+			this.close();
+		}
 	}
 
 	private insertAdvancedToken(value: string): void {
@@ -489,6 +505,47 @@ export class QmdSearchModal extends Modal {
 		const cursor = start + value.length;
 		this.advancedInputEl.setSelectionRange(cursor, cursor);
 		this.dirty = true;
+	}
+
+	private insertWikilinkForSelectedResult(): void {
+		const result = this.results[this.selectedIndex];
+		if (!result) {
+			return;
+		}
+
+		const relativePath = this.plugin.toVaultRelativePath(result.file);
+		if (!relativePath) {
+			new Notice('Search result does not map to the current vault.');
+			return;
+		}
+
+		const wikilink = `[[${relativePath.replace(/\.md$/, '')}]]`;
+		const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!markdownView) {
+			new Notice('No active editor to insert link.');
+			return;
+		}
+
+		markdownView.editor.replaceSelection(wikilink);
+		new Notice(`Inserted ${wikilink}`);
+	}
+
+	private renderInstructions(): void {
+		this.instructionsEl.empty();
+
+		this.createInstruction(this.instructionsEl, '\u2191\u2193', 'navigate');
+
+		if (this.mode === 'advanced') {
+			this.createInstruction(this.instructionsEl, 'cmd/ctrl+enter', 'run query');
+		} else {
+			this.createInstruction(this.instructionsEl, 'enter', 'open');
+			this.createInstruction(this.instructionsEl, 'cmd/ctrl+enter', 'new tab');
+		}
+
+		this.createInstruction(this.instructionsEl, 'alt+enter', 'split');
+		this.createInstruction(this.instructionsEl, 'alt+o', 'open, keep modal');
+		this.createInstruction(this.instructionsEl, 'shift+enter', 'insert link');
+		this.createInstruction(this.instructionsEl, 'tab', 'switch mode');
 	}
 
 	private createInstruction(container: HTMLDivElement, key: string, text: string): void {
