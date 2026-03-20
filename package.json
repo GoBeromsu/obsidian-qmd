@@ -18,7 +18,8 @@
 		"postversion": "git push && git push --tags",
 		"release:patch": "node scripts/release.mjs patch",
 		"release:minor": "node scripts/release.mjs minor",
-		"release:major": "node scripts/release.mjs major"
+		"release:major": "node scripts/release.mjs major",
+		"sync:check": "node scripts/sync-to-plugins.mjs --check"
 	},
 	"keywords": [],
 	"author": "Beomsu Koh",
@@ -44,6 +45,8 @@
 		"vitest": "^2.0.0"
 	},
 	"lint-staged": {
-		"src/**/*.ts": ["eslint --fix"]
+		"src/**/*.ts": [
+			"eslint --fix"
+		]
 	}
 }
