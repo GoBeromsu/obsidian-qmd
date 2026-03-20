@@ -14,24 +14,14 @@
 .qmd-search-shell {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 8px;
 	padding: 16px;
 	color: var(--text-normal);
 }
 
-.qmd-search-banner {
-	display: none;
-	padding: 10px 12px;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 12px;
-	background: var(--background-secondary);
-	color: var(--text-muted);
-}
-.qmd-search-banner.is-visible { display: block; }
-
 .qmd-search-input-row {
 	display: grid;
-	grid-template-columns: 20px minmax(0, 1fr) auto;
+	grid-template-columns: 20px minmax(0, 1fr) auto auto;
 	gap: 10px;
 	align-items: center;
 	min-height: 46px;
@@ -55,9 +45,25 @@
 .qmd-search-clear { display: none; }
 .qmd-search-clear.is-visible { display: flex; }
 
-/* Mode Tabs & Chips */
-.qmd-search-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-.qmd-search-tab,
+/* Mode Indicator & Chips */
+.qmd-mode-indicator {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 999px;
+	background: var(--background-primary);
+	color: var(--text-muted);
+	font-size: var(--font-smallest);
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 120ms ease, color 120ms ease;
+	white-space: nowrap;
+}
+.qmd-mode-indicator:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.qmd-mode-indicator.is-hidden { display: none; }
+.qmd-mode-chevron { width: 12px; height: 12px; color: var(--text-faint); }
 .qmd-advanced-chip {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 999px;
@@ -70,13 +76,7 @@
 	cursor: pointer;
 	transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
-.qmd-search-tab:hover,
 .qmd-advanced-chip:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
-.qmd-search-tab.is-active {
-	background: color-mix(in srgb, var(--interactive-accent) 14%, var(--background-primary));
-	border-color: color-mix(in srgb, var(--interactive-accent) 35%, var(--background-modifier-border));
-	color: var(--text-normal);
-}
 
 /* Advanced Panel */
 .qmd-advanced-panel {

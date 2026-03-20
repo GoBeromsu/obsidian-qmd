@@ -1,10 +1,17 @@
 import type { QmdPluginSettings, QmdSearchMode } from './types';
 
 export const SEARCH_MODE_LABELS: Record<QmdSearchMode, string> = {
-  keyword: 'Keyword',
-  semantic: 'Semantic',
-  hybrid: 'Hybrid',
-  advanced: 'Advanced',
+  keyword: 'Exact match',
+  semantic: 'Meaning-based',
+  hybrid: 'Best of both',
+  advanced: 'Custom query',
+};
+
+export const SEARCH_MODE_DESCRIPTIONS: Record<QmdSearchMode, string> = {
+  keyword: 'BM25 keyword search for exact terms',
+  semantic: 'Vector search for conceptual similarity',
+  hybrid: 'Combined keyword + semantic (recommended)',
+  advanced: 'Structured query with lex/vec/hyde fields',
 };
 
 export const DEFAULT_SETTINGS: QmdPluginSettings = {
@@ -17,5 +24,6 @@ export const DEFAULT_SETTINGS: QmdPluginSettings = {
   autoSyncEnabled: true,
   autoSyncDebounceMs: 7000,
   persistLastMode: true,
+  showModeSelector: true,
   showSyncStatusBar: true,
 };

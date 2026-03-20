@@ -1,6 +1,6 @@
-import { type HoverPopover, MarkdownView, Modal, Notice, setIcon } from 'obsidian';
+import { type HoverPopover, MarkdownView, Menu, Modal, Notice, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
-import { SEARCH_MODE_LABELS } from '../settings';
+import { SEARCH_MODE_DESCRIPTIONS, SEARCH_MODE_LABELS } from '../settings';
 import { validateStructuredQueryDocument } from '../qmd/parser';
 import type { QmdOpenTarget, QmdSearchMode, QmdSearchResult } from '../types';
 import { renderResultItem } from './result-renderer';
@@ -13,7 +13,6 @@ export class QmdSearchModal extends Modal {
 
 	private static activeModal: QmdSearchModal | null = null;
 
-	private readonly modeButtons = new Map<QmdSearchMode, HTMLButtonElement>();
 	private readonly advancedChips: Array<{ label: string; value: string }> = [
 		{ label: 'lex:', value: 'lex: ' },
 		{ label: 'vec:', value: 'vec: ' },
@@ -24,10 +23,10 @@ export class QmdSearchModal extends Modal {
 	private mode: QmdSearchMode;
 	private queryInputEl!: HTMLInputElement;
 	private clearBtnEl!: HTMLButtonElement;
+	private modeIndicatorEl!: HTMLButtonElement;
 	private advancedInputEl!: HTMLTextAreaElement;
 	private advancedPanelEl!: HTMLDivElement;
 	private metaEl!: HTMLDivElement;
-	private bannerEl!: HTMLDivElement;
 	private resultsEl!: HTMLDivElement;
 	private resultEls: HTMLElement[] = [];
 	private results: QmdSearchResult[] = [];
@@ -67,8 +66,6 @@ export class QmdSearchModal extends Modal {
 		contentEl.empty();
 		contentEl.classList.add('qmd-search-shell');
 
-		this.bannerEl = contentEl.createDiv({ cls: 'qmd-search-banner' });
-
 		const inputRow = contentEl.createDiv({ cls: 'qmd-search-input-row' });
 		const iconEl = inputRow.createDiv({ cls: 'qmd-search-icon' });
 		setIcon(iconEl, 'search');
@@ -76,8 +73,21 @@ export class QmdSearchModal extends Modal {
 		this.queryInputEl = inputRow.createEl('input', {
 			type: 'text',
 			cls: 'qmd-search-input',
-			attr: { placeholder: this.getInputPlaceholder() },
+			attr: { placeholder: 'Search your vault...' },
 		});
+
+		this.modeIndicatorEl = inputRow.createEl('button', {
+			cls: 'qmd-mode-indicator',
+			attr: { type: 'button', 'aria-label': 'Change search mode' },
+		});
+		this.modeIndicatorEl.createSpan({ cls: 'qmd-mode-label', text: SEARCH_MODE_LABELS[this.mode] });
+		const chevronEl = this.modeIndicatorEl.createSpan({ cls: 'qmd-mode-chevron' });
+		setIcon(chevronEl, 'chevron-down');
+		this.modeIndicatorEl.addEventListener('click', () => this.showModeMenu());
+
+		if (!this.plugin.settings.showModeSelector) {
+			this.modeIndicatorEl.classList.add('is-hidden');
+		}
 
 		this.clearBtnEl = inputRow.createEl('button', {
 			cls: 'qmd-search-clear clickable-icon',
@@ -88,21 +98,10 @@ export class QmdSearchModal extends Modal {
 			this.queryInputEl.value = '';
 			this.dirty = true;
 			this.results = [];
-			this.renderEmptyState('Type to search your vault with qmd.');
+			this.renderEmptyState('Type to search your vault...');
 			this.updateClearButton();
 			this.queryInputEl.focus();
 		});
-
-		const tabsEl = contentEl.createDiv({ cls: 'qmd-search-tabs' });
-		for (const mode of SEARCH_MODE_ORDER) {
-			const button = tabsEl.createEl('button', {
-				cls: 'qmd-search-tab',
-				text: SEARCH_MODE_LABELS[mode],
-			});
-			button.type = 'button';
-			button.addEventListener('click', () => this.setMode(mode));
-			this.modeButtons.set(mode, button);
-		}
 
 		this.advancedPanelEl = contentEl.createDiv({ cls: 'qmd-advanced-panel' });
 		const chipRow = this.advancedPanelEl.createDiv({ cls: 'qmd-advanced-chip-row' });
@@ -151,7 +150,7 @@ export class QmdSearchModal extends Modal {
 		if (this.initialQuery && this.mode !== 'advanced') {
 			this.scheduleSearch();
 		} else {
-			this.renderEmptyState('Type to search your vault with qmd.');
+			this.renderEmptyState('Type to search your vault...');
 		}
 	}
 
@@ -170,16 +169,15 @@ export class QmdSearchModal extends Modal {
 		this.mode = mode;
 		this.modalEl.dataset.qmdSearchMode = mode;
 
-		for (const [buttonMode, button] of this.modeButtons.entries()) {
-			button.classList.toggle('is-active', buttonMode === mode);
+		const labelEl = this.modeIndicatorEl.querySelector('.qmd-mode-label');
+		if (labelEl) {
+			labelEl.textContent = SEARCH_MODE_LABELS[mode];
 		}
 
 		this.advancedPanelEl.classList.toggle('is-visible', mode === 'advanced');
 		this.queryInputEl.classList.toggle('is-hidden', mode === 'advanced');
-		this.queryInputEl.placeholder = this.getInputPlaceholder();
 
 		this.plugin.rememberSearchMode(mode);
-		this.renderBanner();
 		this.renderInstructions();
 
 		if (mode === 'advanced') {
@@ -199,34 +197,17 @@ export class QmdSearchModal extends Modal {
 		this.setMode(SEARCH_MODE_ORDER[nextIndex]);
 	}
 
-	private getInputPlaceholder(): string {
-		switch (this.mode) {
-			case 'keyword':
-				return 'Keyword search with qmd search';
-			case 'semantic':
-				return 'Semantic search with qmd vsearch';
-			case 'hybrid':
-				return 'Hybrid search with qmd query';
-			case 'advanced':
-				return '';
+	private showModeMenu(): void {
+		const menu = new Menu();
+		for (const mode of SEARCH_MODE_ORDER) {
+			menu.addItem((item) => {
+				item.setTitle(`${SEARCH_MODE_LABELS[mode]}  —  ${SEARCH_MODE_DESCRIPTIONS[mode]}`);
+				item.setChecked(this.mode === mode);
+				item.onClick(() => this.setMode(mode));
+			});
 		}
-	}
-
-	private renderBanner(): void {
-		const setupMessage = this.plugin.getSetupMessage();
-		this.bannerEl.empty();
-
-		if (setupMessage) {
-			this.bannerEl.textContent = setupMessage;
-			this.bannerEl.classList.add('is-visible');
-			return;
-		}
-
-		const collectionName = this.plugin.activeCollection?.name;
-		this.bannerEl.classList.toggle('is-visible', Boolean(collectionName));
-		if (collectionName) {
-			this.bannerEl.textContent = `Collection: ${collectionName} \u00b7 ${SEARCH_MODE_LABELS[this.mode]}`;
-		}
+		const rect = this.modeIndicatorEl.getBoundingClientRect();
+		menu.showAtPosition({ x: rect.left, y: rect.bottom + 4 });
 	}
 
 	private updateClearButton(): void {
@@ -350,7 +331,7 @@ export class QmdSearchModal extends Modal {
 		const setupMessage = this.plugin.getSetupMessage();
 		if (setupMessage) {
 			new Notice(setupMessage);
-			this.renderBanner();
+			this.metaEl.textContent = setupMessage;
 			return;
 		}
 
@@ -358,7 +339,7 @@ export class QmdSearchModal extends Modal {
 		const query = rawQuery.trim();
 		if (!query) {
 			this.results = [];
-			this.renderEmptyState('Type to search your vault with qmd.');
+			this.renderEmptyState('Type to search your vault...');
 			return;
 		}
 
@@ -545,7 +526,6 @@ export class QmdSearchModal extends Modal {
 		this.createInstruction(this.instructionsEl, 'alt+enter', 'split');
 		this.createInstruction(this.instructionsEl, 'alt+o', 'open, keep modal');
 		this.createInstruction(this.instructionsEl, 'shift+enter', 'insert link');
-		this.createInstruction(this.instructionsEl, 'tab', 'switch mode');
 	}
 
 	private createInstruction(container: HTMLDivElement, key: string, text: string): void {

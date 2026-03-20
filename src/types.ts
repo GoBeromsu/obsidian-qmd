@@ -35,6 +35,7 @@ export interface QmdPluginSettings {
   autoSyncEnabled: boolean;
   autoSyncDebounceMs: number;
   persistLastMode: boolean;
+  showModeSelector: boolean;
   showSyncStatusBar: boolean;
 }
 
