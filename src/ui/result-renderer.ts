@@ -1,6 +1,7 @@
 import type { HoverParent } from 'obsidian';
 import type QmdPlugin from '../main';
-import { extractQueryTerms, formatSnippet, highlightSnippet } from '../qmd/parser';
+import { formatSnippet } from '../utils/parser';
+import { extractQueryTerms, highlightSnippet } from './highlight';
 import type { QmdOpenTarget, QmdSearchResult } from '../types';
 import { showResultContextMenu } from './result-actions';
 

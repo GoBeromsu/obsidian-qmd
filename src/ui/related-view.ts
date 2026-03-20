@@ -1,7 +1,7 @@
 import { type HoverPopover, ItemView, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
 import type { CachedRelatedResult, QmdSearchResult } from '../types';
-import { renderResultItem } from '../ui/result-renderer';
+import { renderResultItem } from './result-renderer';
 
 export const QMD_RELATED_VIEW_TYPE = 'qmd-related-view';
 

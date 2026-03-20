@@ -1,14 +1,7 @@
 import { MarkdownView, Plugin, TAbstractFile, TFile } from 'obsidian';
-import { AutoSyncController } from './qmd/auto-sync';
-import { QmdProcessAdapter } from './qmd/adapter';
-import { buildRelatedQueryDocument, buildRelatedQuerySource } from './qmd/query-builder';
-import { toVaultRelativePath } from './qmd/parser';
-import { VaultPathResolver } from './qmd/path-resolver';
-import { DEFAULT_SETTINGS } from './settings';
-import { PluginLogger } from './shared/plugin-logger';
-import { PluginNotices, type NoticeCatalog, type PluginNoticesHost } from './shared/plugin-notices';
-import { QmdSettingTab } from './ui/settings-tab';
-import { QmdSearchModal } from './ui/search-modal';
+import { AutoSyncController } from './domain/auto-sync';
+import { VaultPathResolver } from './domain/path-resolver';
+import { DEFAULT_SETTINGS } from './domain/settings';
 import type {
   QmdCollectionInfo,
   QmdOpenTarget,
@@ -17,7 +10,14 @@ import type {
   QmdSearchResult,
   SyncState,
 } from './types';
-import { QmdRelatedView, QMD_RELATED_VIEW_TYPE } from './views/related-view';
+import { QmdProcessAdapter } from './ui/qmd-process-adapter';
+import { QmdRelatedView, QMD_RELATED_VIEW_TYPE } from './ui/related-view';
+import { QmdSearchModal } from './ui/search-modal';
+import { QmdSettingTab } from './ui/settings-tab';
+import { buildRelatedQueryDocument, buildRelatedQuerySource } from './utils/query-builder';
+import { toVaultRelativePath } from './utils/parser';
+import { PluginLogger } from './shared/plugin-logger';
+import { PluginNotices, type NoticeCatalog, type PluginNoticesHost } from './shared/plugin-notices';
 
 const NOTICE_CATALOG: NoticeCatalog = {
   backend_status:         { template: '{{ message }}', timeout: 5000 },

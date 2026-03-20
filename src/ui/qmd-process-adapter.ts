@@ -9,7 +9,7 @@ import {
   parseCollectionList,
   parseCollectionShow,
   parseSearchResults,
-} from './parser';
+} from '../utils/parser';
 
 type ExecFileAsync = (
   file: string,

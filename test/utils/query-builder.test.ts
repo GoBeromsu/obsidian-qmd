@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildRelatedQueryDocument, buildRelatedQuerySource } from '../../src/qmd/query-builder';
+import { buildRelatedQueryDocument, buildRelatedQuerySource } from '../../src/utils/query-builder';
 
 describe('related query builder', () => {
   it('extracts related-query source from file content and metadata', () => {
