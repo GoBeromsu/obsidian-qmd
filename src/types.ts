@@ -37,6 +37,7 @@ export interface QmdPluginSettings {
   persistLastMode: boolean;
   showModeSelector: boolean;
   showSyncStatusBar: boolean;
+  plugin_notices: { muted: Record<string, boolean> };
 }
 
 export interface RelatedQuerySource {

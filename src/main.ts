@@ -1,10 +1,12 @@
-import { MarkdownView, Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
+import { MarkdownView, Plugin, TAbstractFile, TFile } from 'obsidian';
 import { AutoSyncController } from './qmd/auto-sync';
 import { QmdProcessAdapter } from './qmd/adapter';
 import { buildRelatedQueryDocument, buildRelatedQuerySource } from './qmd/query-builder';
 import { toVaultRelativePath } from './qmd/parser';
 import { VaultPathResolver } from './qmd/path-resolver';
 import { DEFAULT_SETTINGS } from './settings';
+import { PluginLogger } from './shared/plugin-logger';
+import { PluginNotices, type NoticeCatalog, type PluginNoticesHost } from './shared/plugin-notices';
 import { QmdSettingTab } from './ui/settings-tab';
 import { QmdSearchModal } from './ui/search-modal';
 import type {
@@ -17,6 +19,24 @@ import type {
 } from './types';
 import { QmdRelatedView, QMD_RELATED_VIEW_TYPE } from './views/related-view';
 
+const NOTICE_CATALOG: NoticeCatalog = {
+  backend_status:         { template: '{{ message }}', timeout: 5000 },
+  setup_error:            { template: '{{ message }}', timeout: 5000 },
+  sync_complete:          { template: 'QMD sync complete.', timeout: 4000 },
+  sync_error:             { template: '{{ message }}', timeout: 6000 },
+  update_complete:        { template: 'qmd update complete.', timeout: 4000 },
+  update_error:           { template: '{{ message }}', timeout: 6000 },
+  embed_complete:         { template: 'qmd embed complete.', timeout: 4000 },
+  embed_error:            { template: '{{ message }}', timeout: 6000 },
+  open_error:             { template: '{{ message }}', timeout: 5000, immutable: true },
+  vault_map_error:        { template: 'Search result does not map to the current vault.', timeout: 4000, immutable: true },
+  resolve_error:          { template: 'Could not resolve {{ path }}.', timeout: 4000, immutable: true },
+  wikilink_copied:        { template: 'Copied wikilink.', timeout: 3000, immutable: true },
+  wikilink_copy_failed:   { template: 'Failed to copy wikilink.', timeout: 4000, immutable: true },
+  wikilink_inserted:      { template: 'Inserted {{ wikilink }}', timeout: 3000, immutable: true },
+  no_active_editor:       { template: 'No active editor to insert link.', timeout: 4000, immutable: true },
+};
+
 export default class QmdPlugin extends Plugin {
   settings: QmdPluginSettings;
   adapter: QmdProcessAdapter;
@@ -24,6 +44,8 @@ export default class QmdPlugin extends Plugin {
   activeCollection: QmdCollectionInfo | null = null;
   syncState: SyncState = { phase: 'idle', message: 'QMD ready' };
 
+  readonly notices = new PluginNotices(this as unknown as PluginNoticesHost, NOTICE_CATALOG, 'QMD');
+  private readonly logger = new PluginLogger('QMD');
   private setupMessage: string | null = null;
   private statusBarEl?: HTMLElement;
   private autoSync?: AutoSyncController;
@@ -74,6 +96,7 @@ export default class QmdPlugin extends Plugin {
   onunload(): void {
     this.unloading = true;
     this.autoSync?.dispose();
+    this.notices.unload();
   }
 
   async loadSettings(): Promise<void> {
@@ -168,7 +191,7 @@ export default class QmdPlugin extends Plugin {
     await this.refreshRelatedView();
 
     if (showNotice) {
-      new Notice(this.describeBackend());
+      this.notices.show('backend_status', { message: this.describeBackend() });
     }
   }
 
@@ -383,7 +406,7 @@ export default class QmdPlugin extends Plugin {
 
   private async runSyncNow(): Promise<void> {
     if (this.setupMessage) {
-      new Notice(this.setupMessage);
+      this.notices.show('setup_error', { message: this.setupMessage });
       return;
     }
 
@@ -395,7 +418,7 @@ export default class QmdPlugin extends Plugin {
       this.syncState = { phase: 'idle', message: 'QMD ready' };
       this.refreshStatusBar();
       await this.refreshRelatedView();
-      new Notice('QMD sync complete.');
+      this.notices.show('sync_complete');
     } catch (error) {
       this.syncState = {
         phase: 'error',
@@ -403,7 +426,7 @@ export default class QmdPlugin extends Plugin {
         error: error instanceof Error ? error.message : String(error),
       };
       this.refreshStatusBar();
-      new Notice(this.syncState.error ?? 'QMD sync failed.');
+      this.notices.show('sync_error', { message: this.syncState.error ?? 'QMD sync failed.' });
     }
   }
 
@@ -414,7 +437,7 @@ export default class QmdPlugin extends Plugin {
       this.refreshStatusBar();
       await this.adapter.runUpdate();
       await this.refreshBackendState();
-      new Notice('qmd update complete.');
+      this.notices.show('update_complete');
     } catch (error) {
       this.syncState = {
         phase: 'error',
@@ -422,7 +445,7 @@ export default class QmdPlugin extends Plugin {
         error: error instanceof Error ? error.message : String(error),
       };
       this.refreshStatusBar();
-      new Notice(this.syncState.error ?? 'qmd update failed.');
+      this.notices.show('update_error', { message: this.syncState.error ?? 'qmd update failed.' });
     }
   }
 
@@ -435,7 +458,7 @@ export default class QmdPlugin extends Plugin {
       this.syncState = { phase: 'idle', message: 'QMD ready' };
       this.refreshStatusBar();
       await this.refreshRelatedView();
-      new Notice('qmd embed complete.');
+      this.notices.show('embed_complete');
     } catch (error) {
       this.syncState = {
         phase: 'error',
@@ -443,7 +466,7 @@ export default class QmdPlugin extends Plugin {
         error: error instanceof Error ? error.message : String(error),
       };
       this.refreshStatusBar();
-      new Notice(this.syncState.error ?? 'qmd embed failed.');
+      this.notices.show('embed_error', { message: this.syncState.error ?? 'qmd embed failed.' });
     }
   }
 

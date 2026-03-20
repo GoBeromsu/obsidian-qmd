@@ -1,4 +1,4 @@
-import { type HoverPopover, ItemView, Notice, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
+import { type HoverPopover, ItemView, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
 import type { CachedRelatedResult, QmdSearchResult } from '../types';
 import { renderResultItem } from '../ui/result-renderer';
@@ -247,9 +247,9 @@ export class QmdRelatedView extends ItemView {
 				sourceId: QMD_RELATED_VIEW_TYPE,
 				hoverParent: this,
 				onOpen: (_i, target) => {
-					void this.plugin.openSearchResult(result, target).catch((error) => {
+					void this.plugin.openSearchResult(result, target).catch((error: unknown) => {
 						const message = error instanceof Error ? error.message : String(error);
-						new Notice(message);
+						this.plugin.notices.show('open_error', { message });
 					});
 				},
 			});

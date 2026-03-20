@@ -1,17 +1,17 @@
-import { Menu, Notice, TFile } from 'obsidian';
+import { Menu, TFile } from 'obsidian';
 import type QmdPlugin from '../main';
 import type { QmdSearchResult } from '../types';
 
 export function showResultContextMenu(plugin: QmdPlugin, result: QmdSearchResult, event: MouseEvent): void {
   const relativePath = plugin.toVaultRelativePath(result.file);
   if (!relativePath) {
-    new Notice('Search result does not map to the current vault.');
+    plugin.notices.show('vault_map_error');
     return;
   }
 
   const abstractFile = plugin.app.vault.getAbstractFileByPath(relativePath);
   if (!(abstractFile instanceof TFile)) {
-    new Notice(`Could not resolve ${relativePath}.`);
+    plugin.notices.show('resolve_error', { path: relativePath });
     return;
   }
 
@@ -51,20 +51,20 @@ export function showResultContextMenu(plugin: QmdPlugin, result: QmdSearchResult
       .setTitle('Copy wikilink')
       .setIcon('link')
       .onClick(() => {
-        void copyWikilink(relativePath);
+        void copyWikilink(plugin, relativePath);
       }),
   );
 
   menu.showAtMouseEvent(event);
 }
 
-async function copyWikilink(relativePath: string): Promise<void> {
+async function copyWikilink(plugin: QmdPlugin, relativePath: string): Promise<void> {
   const wikilink = `[[${relativePath.replace(/\.md$/, '')}]]`;
 
   try {
     await navigator.clipboard.writeText(wikilink);
-    new Notice('Copied wikilink.');
+    plugin.notices.show('wikilink_copied');
   } catch {
-    new Notice('Failed to copy wikilink.');
+    plugin.notices.show('wikilink_copy_failed');
   }
 }

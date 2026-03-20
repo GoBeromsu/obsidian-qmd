@@ -26,4 +26,5 @@ export const DEFAULT_SETTINGS: QmdPluginSettings = {
   persistLastMode: true,
   showModeSelector: true,
   showSyncStatusBar: true,
+  plugin_notices: { muted: {} },
 };

@@ -1,4 +1,4 @@
-import { type HoverPopover, MarkdownView, Menu, Modal, Notice, setIcon } from 'obsidian';
+import { type HoverPopover, MarkdownView, Menu, Modal, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
 import { SEARCH_MODE_DESCRIPTIONS, SEARCH_MODE_LABELS } from '../settings';
 import { validateStructuredQueryDocument } from '../qmd/parser';
@@ -330,7 +330,7 @@ export class QmdSearchModal extends Modal {
 	private async submitCurrentQuery(): Promise<void> {
 		const setupMessage = this.plugin.getSetupMessage();
 		if (setupMessage) {
-			new Notice(setupMessage);
+			this.plugin.notices.show('setup_error', { message: setupMessage });
 			this.metaEl.textContent = setupMessage;
 			return;
 		}
@@ -496,19 +496,19 @@ export class QmdSearchModal extends Modal {
 
 		const relativePath = this.plugin.toVaultRelativePath(result.file);
 		if (!relativePath) {
-			new Notice('Search result does not map to the current vault.');
+			this.plugin.notices.show('vault_map_error');
 			return;
 		}
 
 		const wikilink = `[[${relativePath.replace(/\.md$/, '')}]]`;
 		const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!markdownView) {
-			new Notice('No active editor to insert link.');
+			this.plugin.notices.show('no_active_editor');
 			return;
 		}
 
 		markdownView.editor.replaceSelection(wikilink);
-		new Notice(`Inserted ${wikilink}`);
+		this.plugin.notices.show('wikilink_inserted', { wikilink });
 	}
 
 	private renderInstructions(): void {
