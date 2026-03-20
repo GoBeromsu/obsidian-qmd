@@ -21,6 +21,10 @@ function formatLexTerm(value: string): string {
   return /\s/.test(value) ? `"${value}"` : value;
 }
 
+function sanitizeForVec(value: string): string {
+  return value.replace(/(^|\s)-(?=\w)/g, '$1').trim();
+}
+
 export function buildRelatedQuerySource(
   filePath: string,
   _content: string,
@@ -75,8 +79,8 @@ export function buildRelatedQueryDocument(source: RelatedQuerySource): string {
     lines.push(`lex: ${lexTerms.join(' ')}`);
   }
 
-  lines.push(`vec: ${vecParts.join(' ')}`);
-  lines.push(`hyde: ${hydeParts.join(' ')}`);
+  lines.push(`vec: ${sanitizeForVec(vecParts.join(' '))}`);
+  lines.push(`hyde: ${sanitizeForVec(hydeParts.join(' '))}`);
 
   return lines.join('\n');
 }

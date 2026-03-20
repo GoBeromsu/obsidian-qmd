@@ -64,6 +64,22 @@ describe('related query builder', () => {
     expect(query).not.toContain('Sections:');
   });
 
+  it('strips negation operators from vec and hyde lines', () => {
+    const query = buildRelatedQueryDocument({
+      title: '2026-03-20',
+      aliases: [],
+      tags: ['plan/일기'],
+      headings: ['Thanks', '-Tasks', 'Reflection'],
+    });
+
+    const vecLine = query.split('\n').find((line) => line.startsWith('vec:'));
+    const hydeLine = query.split('\n').find((line) => line.startsWith('hyde:'));
+    expect(vecLine).not.toMatch(/\s-\w/);
+    expect(hydeLine).not.toMatch(/\s-\w/);
+    expect(vecLine).toContain('Tasks');
+    expect(hydeLine).toContain('Tasks');
+  });
+
   it('limits topic terms in intent to 3', () => {
     const query = buildRelatedQueryDocument({
       title: 'Big Note',
