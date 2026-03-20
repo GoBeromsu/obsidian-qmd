@@ -127,6 +127,17 @@ export class QmdSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
+      .setName('Show mode selector')
+      .setDesc('Display the search mode pill in the search modal.')
+      .addToggle((toggle) => {
+        toggle.setValue(this.plugin.settings.showModeSelector);
+        toggle.onChange(async (value) => {
+          this.plugin.settings.showModeSelector = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
       .setName('Show sync status bar item')
       .setDesc('Display QMD status in the Obsidian status bar.')
       .addToggle((toggle) => {
