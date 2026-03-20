@@ -121,9 +121,9 @@ export class QmdRelatedView extends ItemView {
 				return;
 			}
 
-			const message = error instanceof Error ? error.message : String(error);
+			this.plugin.logger.error('Failed to find related notes', error);
 			this.renderShell(activeFile);
-			this.renderEmpty(message, 'alert-circle');
+			this.renderEmpty('Could not find related notes. Try refreshing.', 'alert-circle');
 		}
 	}
 

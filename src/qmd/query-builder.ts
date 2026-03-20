@@ -22,7 +22,10 @@ function formatLexTerm(value: string): string {
 }
 
 function sanitizeForVec(value: string): string {
-  return value.replace(/(^|\s)-(?=\w)/g, '$1').trim();
+  // QMD rejects ANY -term (including -13 in dates like 2026-03-13) in vec/hyde queries.
+  // Replace all hyphens with spaces to avoid negation interpretation.
+  // This is safe because vec/hyde are semantic queries — hyphens don't affect meaning.
+  return value.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export function buildRelatedQuerySource(
@@ -37,7 +40,10 @@ export function buildRelatedQuerySource(
     ...asArray(frontmatter?.tags),
     ...(metadata?.tags ?? []).map((tag) => tag.tag.replace(/^#/, '')),
   ], 8);
-  const headingValues = unique((metadata?.headings ?? []).map((heading) => heading.heading), 6);
+  const headingValues = unique(
+    (metadata?.headings ?? []).map((heading) => heading.heading.replace(/\[\[|\]\]/g, '')),
+    6,
+  );
 
   return {
     title: rawTitle,

@@ -45,7 +45,7 @@ export default class QmdPlugin extends Plugin {
   syncState: SyncState = { phase: 'idle', message: 'QMD ready' };
 
   readonly notices = new PluginNotices(this as unknown as PluginNoticesHost, NOTICE_CATALOG, 'QMD');
-  private readonly logger = new PluginLogger('QMD');
+  readonly logger = new PluginLogger('QMD');
   private setupMessage: string | null = null;
   private statusBarEl?: HTMLElement;
   private autoSync?: AutoSyncController;
