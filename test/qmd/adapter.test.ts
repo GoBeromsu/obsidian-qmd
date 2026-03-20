@@ -73,7 +73,7 @@ describe('QmdProcessAdapter', () => {
     chmodSync(nodePath, 0o755);
 
     const execFileAsync = vi.fn(async (file: string, args: string[]) => {
-      if (file === '/bin/zsh') {
+      if ((file === '/bin/zsh' || file === '/bin/bash') && args.includes('-lc')) {
         return {
           stdout: `${qmdPath}\n`,
           stderr: '',
