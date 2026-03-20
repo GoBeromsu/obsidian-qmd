@@ -1,7 +1,7 @@
 import { type HoverPopover, MarkdownView, Menu, Modal, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
-import { SEARCH_MODE_DESCRIPTIONS, SEARCH_MODE_LABELS } from '../settings';
-import { validateStructuredQueryDocument } from '../qmd/parser';
+import { SEARCH_MODE_DESCRIPTIONS, SEARCH_MODE_LABELS } from '../domain/settings';
+import { validateStructuredQueryDocument } from '../utils/parser';
 import type { QmdOpenTarget, QmdSearchMode, QmdSearchResult } from '../types';
 import { renderResultItem } from './result-renderer';
 

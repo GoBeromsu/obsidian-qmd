@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { QmdProcessAdapter } from '../../src/qmd/adapter';
+import { QmdProcessAdapter } from '../../src/ui/qmd-process-adapter';
 
 describe('QmdProcessAdapter', () => {
   const tempDirs: string[] = [];

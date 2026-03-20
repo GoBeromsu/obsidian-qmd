@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handelize, VaultPathResolver } from '../../src/qmd/path-resolver';
+import { handelize, VaultPathResolver } from '../../src/domain/path-resolver';
 
 describe('handelize', () => {
 	it('lowercases and replaces spaces with hyphens', () => {

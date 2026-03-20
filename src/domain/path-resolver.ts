@@ -1,4 +1,4 @@
-import type { TFile } from 'obsidian';
+import type { FileRef } from '../types';
 
 /**
  * Converts emoji runs to their hex codepoints (mirrors QMD's emojiToHex).
@@ -54,7 +54,7 @@ export class VaultPathResolver {
 		this.dirty = true;
 	}
 
-	rebuild(files: TFile[]): void {
+	rebuild(files: FileRef[]): void {
 		this.slugToReal.clear();
 		for (const file of files) {
 			try {
@@ -67,7 +67,7 @@ export class VaultPathResolver {
 		this.dirty = false;
 	}
 
-	rebuildIfDirty(files: TFile[]): void {
+	rebuildIfDirty(files: FileRef[]): void {
 		if (this.dirty) {
 			this.rebuild(files);
 		}

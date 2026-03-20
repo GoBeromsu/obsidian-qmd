@@ -7,7 +7,7 @@ import {
   parseSearchResults,
   toVaultRelativePath,
   validateStructuredQueryDocument,
-} from '../../src/qmd/parser';
+} from '../../src/utils/parser';
 
 describe('qmd parser helpers', () => {
   it('parses collection list output', () => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AutoSyncController } from '../../src/qmd/auto-sync';
+import { AutoSyncController } from '../../src/domain/auto-sync';
 
 describe('AutoSyncController', () => {
   afterEach(() => {

@@ -1,6 +1,6 @@
 import { PluginSettingTab, Setting } from 'obsidian';
 import type QmdPlugin from '../main';
-import { SEARCH_MODE_LABELS } from '../settings';
+import { SEARCH_MODE_LABELS } from '../domain/settings';
 import type { QmdSearchMode } from '../types';
 
 export class QmdSettingTab extends PluginSettingTab {
