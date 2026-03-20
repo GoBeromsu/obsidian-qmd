@@ -26,6 +26,7 @@ export const baseConfig = tseslint.config(
 	},
 	{
 		files: ['src/domain/**/*.ts', 'src/types/**/*.ts', 'src/utils/**/*.ts'],
+		ignores: ['**/*.d.ts'],
 		rules: {
 			'no-restricted-imports': ['error', {
 				patterns: [{
