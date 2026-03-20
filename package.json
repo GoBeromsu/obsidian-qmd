@@ -14,12 +14,10 @@
 		"ci": "pnpm run build && pnpm run lint && pnpm run test",
 		"prepare": "husky",
 		"version": "node scripts/version.mjs",
-		"sync:plugins": "node scripts/sync-to-plugins.mjs",
 		"postversion": "git push && git push --tags",
 		"release:patch": "node scripts/release.mjs patch",
 		"release:minor": "node scripts/release.mjs minor",
-		"release:major": "node scripts/release.mjs major",
-		"sync:check": "node scripts/sync-to-plugins.mjs --check"
+		"release:major": "node scripts/release.mjs major"
 	},
 	"keywords": [],
 	"author": "Beomsu Koh",
