@@ -1,7 +1,3 @@
-import { extractQueryTerms } from '../utils/parser';
-
-export { extractQueryTerms };
-
 export function highlightSnippet(snippet: string, queryTerms: string[]): DocumentFragment {
 	const fragment = document.createDocumentFragment();
 

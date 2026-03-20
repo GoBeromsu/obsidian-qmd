@@ -36,14 +36,6 @@ export class AutoSyncController {
 		this.schedule();
 	}
 
-	async flushNow(): Promise<void> {
-		if (this.disposed) return;
-
-		this.dirty = true;
-		this.clearTimer();
-		await this.runIfNeeded();
-	}
-
 	dispose(): void {
 		this.disposed = true;
 		this.clearTimer();

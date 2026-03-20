@@ -411,7 +411,7 @@ export default class QmdPlugin extends Plugin {
     }
 
     try {
-      await this.ensureBinary();
+      await this.adapter.checkBinary();
       this.syncState = { phase: 'syncing', message: 'Running qmd update...' };
       this.refreshStatusBar();
       await this.adapter.runAutoSync();
@@ -432,7 +432,7 @@ export default class QmdPlugin extends Plugin {
 
   private async runUpdateCommand(): Promise<void> {
     try {
-      await this.ensureBinary();
+      await this.adapter.checkBinary();
       this.syncState = { phase: 'syncing', message: 'Running qmd update...' };
       this.refreshStatusBar();
       await this.adapter.runUpdate();
@@ -451,7 +451,7 @@ export default class QmdPlugin extends Plugin {
 
   private async runEmbedCommand(): Promise<void> {
     try {
-      await this.ensureBinary();
+      await this.adapter.checkBinary();
       this.syncState = { phase: 'embedding', message: 'Running qmd embed...' };
       this.refreshStatusBar();
       await this.adapter.runEmbed();
@@ -467,14 +467,6 @@ export default class QmdPlugin extends Plugin {
       };
       this.refreshStatusBar();
       this.notices.show('embed_error', { message: this.syncState.error ?? 'qmd embed failed.' });
-    }
-  }
-
-  private async ensureBinary(): Promise<void> {
-    try {
-      await this.adapter.checkBinary();
-    } catch (error) {
-      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 

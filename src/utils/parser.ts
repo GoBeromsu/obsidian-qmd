@@ -76,7 +76,7 @@ export function parseSearchResults(stdout: string): QmdSearchResult[] {
 	}));
 }
 
-export function parseVirtualPath(value: string): { collectionName: string; relativePath: string } | null {
+function parseVirtualPath(value: string): { collectionName: string; relativePath: string } | null {
 	const match = value.match(VIRTUAL_PATH_RE);
 	if (!match) {
 		return null;
