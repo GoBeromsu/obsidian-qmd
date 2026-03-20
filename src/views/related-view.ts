@@ -208,7 +208,7 @@ export class QmdRelatedView extends ItemView {
 		const skeletonEl = this.container.createDiv({ cls: 'qmd-skeleton-container' });
 		for (let i = 0; i < 4; i++) {
 			const row = skeletonEl.createDiv({ cls: 'qmd-skeleton-row' });
-			row.createDiv({ cls: 'qmd-skeleton-bar' });
+			row.createDiv({ cls: 'qmd-skeleton-score' });
 			const body = row.createDiv({ cls: 'qmd-skeleton-body' });
 			body.createDiv({ cls: 'qmd-skeleton-title' });
 			body.createDiv({ cls: 'qmd-skeleton-snippet' });

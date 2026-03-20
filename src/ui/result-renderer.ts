@@ -50,17 +50,17 @@ export function renderResultItem(opts: RenderResultOptions): HTMLElement {
 	});
 	el.style.setProperty('--qmd-result-delay', `${Math.min(index * 25, 500)}ms`);
 
-	el.createDiv({ cls: `qmd-result-bar qmd-result-bar--${tier}` });
-
-	const body = el.createDiv({ cls: 'qmd-result-body' });
-	const header = body.createDiv({ cls: 'qmd-result-header' });
-	header.createSpan({
-		cls: `qmd-result-title${tier === 'high' ? ' qmd-result-title--strong' : ''}`,
-		text: title,
-	});
-	header.createSpan({
+	// Score on the LEFT (SC-style)
+	el.createSpan({
 		cls: `qmd-result-score qmd-result-score--${tier}`,
 		text: pct,
+	});
+
+	// Content: title + path + snippet
+	const body = el.createDiv({ cls: 'qmd-result-body' });
+	body.createSpan({
+		cls: `qmd-result-title${tier === 'high' ? ' qmd-result-title--strong' : ''}`,
+		text: title,
 	});
 
 	if (breadcrumb) {
