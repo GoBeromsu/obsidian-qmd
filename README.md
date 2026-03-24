@@ -1,72 +1,119 @@
-# Obsidian QMD
+# QMD
 
-Augmented search for Obsidian powered by [QMD](https://github.com/tobi/qmd) -- combines BM25 keyword search, semantic vector search, and hybrid queries to find notes by exact terms or by meaning.
+Local semantic search for Obsidian.
+
+QMD bridges Obsidian with a local QMD daemon to deliver fast, privacy-first semantic search across your vault. All processing happens on your machine—no data leaves your device. Search by meaning instead of keywords, discover related notes automatically, and keep your notes indexed in real time.
 
 ## Features
 
-- **Search modal** with four modes: keyword (BM25), semantic (vector), hybrid (combined), and advanced (structured `lex:`/`vec:`/`hyde:` queries)
-- **Related notes sidebar** -- shows semantically related notes for the active file
-- **Snippet highlighting** -- search results include highlighted text snippets with context
-- **Wikilink insert** -- insert a wikilink to any search result directly into the active editor
-- **Auto-sync** -- debounced background sync runs `qmd update` and `qmd embed` after note changes
-- **Status bar** -- real-time sync and collection status indicator
-- **Hover preview** -- hover over search results and related notes to preview content
+- **Local semantic search** — all processing runs on your machine; zero cloud dependencies
+- **Related notes view** — always-on sidebar showing semantically similar notes
+- **Natural language search** — find notes by meaning using the search modal
+- **Four search modes** — keyword (BM25), semantic (vector), hybrid (combined), and advanced queries
+- **Auto-sync** — automatically re-indexes notes when they change
+- **Fast response** — instant results via local QMD daemon
+- **Privacy-first** — zero data leaves your machine
+- **Snippet highlighting** — search results include context snippets
+- **Wikilink insert** — add results directly to your active note
+- **Status bar** — real-time sync and indexing progress
 
-## Prerequisites
+## Requirements
 
-- Obsidian desktop (desktop only)
-- Local [`qmd`](https://github.com/tobi/qmd) binary installed and available on `PATH`, or configured in plugin settings
-- A QMD collection whose path matches the current vault path
+- **Obsidian** (desktop only; v0.15.0+)
+- **QMD daemon** — local binary installed and running on your system
+  - Installation: https://github.com/tobi/qmd
+  - The plugin auto-detects the QMD binary on `PATH` or configure a custom path in settings
+- **Active QMD collection** — a QMD collection matching your vault directory
 
 ## Installation
 
-This plugin is not yet available in the Obsidian community plugin directory.
+### From Release (Recommended)
 
-### Manual Installation
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/GoBeromsu/obsidian-qmd/releases/latest)
+2. Create `.obsidian/plugins/qmd/` in your vault
+3. Copy the three files into that directory
+4. Reload Obsidian
+5. Enable **QMD** in Settings > Community plugins
+
+### From Source
 
 ```bash
 cd <your-vault>/.obsidian/plugins
-git clone https://github.com/GoBeromsu/obsidian-qmd.git obsidian-qmd
-cd obsidian-qmd
-pnpm install && pnpm build
+git clone https://github.com/GoBeromsu/obsidian-qmd.git qmd
+cd qmd
+pnpm install
+pnpm build
 ```
 
 Reload Obsidian and enable the plugin under **Settings > Community plugins**.
 
 ## Usage
 
-1. Install and configure the `qmd` CLI on your system
+### Getting Started
+
+1. Ensure the `qmd` daemon is installed and available on your system
 2. Create a QMD collection pointing to your vault folder
-3. Open the search modal with the command palette or hotkey
-4. Type your query and switch between search modes using the mode selector
-5. Click a result to open the note, or use the wikilink action to insert a link
+3. Configure the plugin in Settings > QMD
+4. Open the search modal: use the command palette or your configured hotkey
 
-## Commands
+### Search Modes
 
-| Command | Description |
-|---------|-------------|
-| QMD: Open search | Open the search modal |
-| QMD: Open related notes | Open the related notes sidebar |
-| QMD: Refresh related notes | Refresh the related notes view |
-| QMD: Sync qmd now | Run `qmd update` + `qmd embed` immediately |
-| QMD: Run qmd update | Index new and changed files |
-| QMD: Run qmd embed | Generate embeddings for unembedded documents |
-| QMD: Re-scan qmd collections | Re-detect QMD collections for this vault |
+QMD offers four complementary search modes:
 
-## Settings
+| Mode | Best For | Example |
+|------|----------|---------|
+| **Keyword** (BM25) | Exact terms, technical keywords | `obsidian plugin development` |
+| **Semantic** (Vector) | Meaning, concepts, paraphrases | `how do I extend Obsidian` |
+| **Hybrid** | Balanced mix of both | `embedding models` |
+| **Advanced** | Structured queries | `lex:plugin vec:semantic hyde:advanced` |
+
+### Commands
+
+- **QMD: Open search** — Open the search modal (primary interface)
+- **QMD: Open related notes** — Show related notes for the active file
+- **QMD: Refresh related notes** — Manually refresh the related notes view
+- **QMD: Sync qmd now** — Trigger immediate indexing and embedding
+- **QMD: Run qmd update** — Index new and changed files
+- **QMD: Run qmd embed** — Generate embeddings for unindexed documents
+- **QMD: Re-scan qmd collections** — Auto-detect QMD collections for this vault
+
+## Configuration
+
+Open **Settings > QMD** to customize behavior.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| QMD executable path | `auto` | Path to the `qmd` binary, or `auto` to detect from PATH |
-| Collection override | _(empty)_ | Force a specific QMD collection name instead of auto-detecting |
-| Default search mode | `hybrid` | Initial search mode when opening the modal |
-| Preview result limit | `8` | Maximum number of results shown in search |
-| Related result limit | `8` | Maximum number of related notes shown in the sidebar |
-| Auto-sync enabled | `true` | Automatically run update + embed after note changes |
-| Auto-sync debounce | `7000ms` | Delay before auto-sync triggers after the last change |
-| Show mode selector | `true` | Show the search mode toggle in the search modal |
-| Persist last mode | `true` | Remember the last-used search mode across sessions |
+| QMD executable path | `auto` | Path to the `qmd` binary, or `auto` to auto-detect |
+| Collection override | _(empty)_ | Force a specific QMD collection name (advanced) |
+| Default search mode | `hybrid` | Initial mode when opening the search modal |
+| Preview result limit | `8` | Maximum search results shown |
+| Related result limit | `8` | Maximum related notes shown in the sidebar |
+| Auto-sync enabled | `true` | Automatically index notes when they change |
+| Auto-sync debounce | `7000ms` | Wait time after last change before auto-sync |
+| Show mode selector | `true` | Display the search mode toggle |
+| Persist last mode | `true` | Remember the last-used search mode between sessions |
 | Show sync status bar | `true` | Display QMD status in the status bar |
+
+## Screenshots
+
+<!-- screenshot -->
+
+## Support
+
+If you find QMD useful, consider supporting the developer:
+
+[Buy me a coffee](https://buymeacoffee.com/gobeumsu9)
+
+## Development
+
+```bash
+pnpm install
+pnpm dev           # vault selection + esbuild watch + hot reload
+pnpm build         # TypeScript check + production build
+pnpm test          # Unit tests (Vitest)
+pnpm lint          # ESLint
+pnpm run ci        # build + lint + test
+```
 
 ## Tech Stack
 
@@ -75,7 +122,7 @@ Reload Obsidian and enable the plugin under **Settings > Community plugins**.
 | Platform | Obsidian Plugin API |
 | Language | TypeScript 5 |
 | Bundler | esbuild |
-| Search engine | QMD CLI (BM25 + vector + hybrid) |
+| Search Engine | QMD CLI (BM25 + vector search + hybrid) |
 | Testing | Vitest |
 | Linting | ESLint + Husky + lint-staged |
 
@@ -84,29 +131,32 @@ Reload Obsidian and enable the plugin under **Settings > Community plugins**.
 ```
 obsidian-qmd/
 ├── src/
-│   ├── main.ts              # Plugin entry point (QmdPlugin)
-│   ├── settings.ts           # Default settings and mode labels
-│   ├── types.ts              # Shared TypeScript types
-│   ├── qmd/                  # QMD CLI adapter, auto-sync, query builder, path resolver
-│   ├── ui/                   # Search modal, settings tab, result actions/renderer
-│   ├── views/                # Related notes sidebar view
-│   └── shared/               # Shared utilities (plugin-logger, plugin-notices)
-├── scripts/                  # dev.mjs, version.mjs, release.mjs
-├── boiler.config.mjs         # Per-repo config
-└── manifest.json             # Obsidian plugin manifest
+│   ├── main.ts              # Plugin entry point
+│   ├── settings.ts          # Settings and configuration
+│   ├── types.ts             # TypeScript type definitions
+│   ├── qmd/                 # QMD CLI adapter and logic
+│   ├── ui/                  # Search modal, settings, result actions
+│   ├── views/               # Related notes sidebar view
+│   └── shared/              # Shared utilities (synced from boiler)
+├── scripts/                 # Build and release scripts
+├── boiler.config.mjs        # Plugin configuration
+└── manifest.json            # Obsidian plugin manifest
 ```
 
-## Development
+## Contributing
 
-```bash
-pnpm install
-pnpm dev          # vault selection + esbuild watch + hot reload
-pnpm build        # tsc type-check + production build
-pnpm test         # Vitest unit tests
-pnpm lint         # ESLint
-pnpm run ci       # build + lint + test
-```
+1. Fork this repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Follow [Conventional Commits](https://www.conventionalcommits.org/)
+4. Run `pnpm run ci` to verify changes
+5. Submit a pull request
 
 ## License
 
 MIT
+
+## Links
+
+- [GitHub Repository](https://github.com/GoBeromsu/obsidian-qmd)
+- [QMD Project](https://github.com/tobi/qmd)
+- [Obsidian Plugin Docs](https://docs.obsidian.md/)
