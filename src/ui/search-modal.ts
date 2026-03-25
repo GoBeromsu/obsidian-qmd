@@ -117,7 +117,7 @@ export class QmdSearchModal extends Modal {
 		this.advancedInputEl = this.advancedPanelEl.createEl('textarea', {
 			cls: 'qmd-advanced-input',
 			attr: {
-				placeholder: 'intent: what you want\nlex: exact words\nvec: semantic intent',
+				placeholder: 'Intent: what you want\nlex: exact words\nvec: semantic intent',
 			},
 		});
 

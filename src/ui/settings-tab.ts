@@ -25,9 +25,9 @@ export class QmdSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Executable path')
-      .setDesc('Leave blank, "auto", or "qmd" to auto-detect npm, bun, nvm, and common PATH installs.')
+      .setDesc('Leave blank, "auto", or "qmd" to auto-detect npm, bun, nvm, and common path installs.')
       .addText((text) => {
-        text.setPlaceholder('auto');
+        text.setPlaceholder('Auto');
         text.setValue(this.plugin.settings.qmdExecutablePath);
         text.onChange(async (value) => {
           this.plugin.settings.qmdExecutablePath = value.trim();
@@ -41,7 +41,7 @@ export class QmdSettingTab extends PluginSettingTab {
       .setName('Collection override')
       .setDesc('Optional qmd collection name to force instead of vault-path auto-detection.')
       .addText((text) => {
-        text.setPlaceholder('obsidian');
+        text.setPlaceholder('Obsidian');
         text.setValue(this.plugin.settings.collectionOverride);
         text.onChange(async (value) => {
           this.plugin.settings.collectionOverride = value.trim();
