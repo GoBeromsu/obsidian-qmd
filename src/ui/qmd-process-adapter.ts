@@ -14,7 +14,7 @@ import {
 type ExecFileAsync = (
   file: string,
   args: string[],
-  options: { encoding: 'utf8'; maxBuffer: number; cwd?: string },
+  options: { encoding: 'utf8'; maxBuffer: number; cwd?: string; env?: NodeJS.ProcessEnv },
 ) => Promise<{ stdout: string; stderr: string }>;
 
 const defaultExecFile = promisify(execFile) as ExecFileAsync;
@@ -159,9 +159,22 @@ export class QmdProcessAdapter {
       return await this.execFileAsync(invocation.file, invocation.args, {
         encoding: 'utf8',
         maxBuffer: 10 * 1024 * 1024,
+        env: await this.buildEnvWithNode(executable),
       });
     } catch (error) {
       throw this.normalizeError(error, executable, invocation.file);
+    }
+  }
+
+  private async buildEnvWithNode(executablePath: string): Promise<NodeJS.ProcessEnv> {
+    try {
+      const nodePath = await this.resolveNodeRuntime(executablePath);
+      const nodeBinDir = path.dirname(nodePath);
+      const currentPath = process.env.PATH ?? '';
+      if (currentPath.split(':').includes(nodeBinDir)) return process.env;
+      return { ...process.env, PATH: `${nodeBinDir}:${currentPath}` };
+    } catch {
+      return process.env;
     }
   }
 
