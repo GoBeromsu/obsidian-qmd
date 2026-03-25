@@ -100,7 +100,7 @@ export default class QmdPlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData() as Partial<typeof DEFAULT_SETTINGS>) };
   }
 
   async saveSettings(): Promise<void> {
@@ -200,7 +200,7 @@ export default class QmdPlugin extends Plugin {
       return;
     }
 
-    this.statusBarEl.style.display = this.settings.showSyncStatusBar ? '' : 'none';
+    this.statusBarEl.toggleClass('qmd-status-bar--hidden', !this.settings.showSyncStatusBar);
     if (!this.settings.showSyncStatusBar) {
       return;
     }

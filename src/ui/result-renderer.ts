@@ -50,7 +50,7 @@ export function renderResultItem(opts: RenderResultOptions): HTMLElement {
 			'aria-label': `${title} \u2014 ${pct}`,
 		},
 	});
-	el.style.setProperty('--qmd-result-delay', `${Math.min(index * 25, 500)}ms`);
+	el.setCssProps({ '--qmd-result-delay': `${Math.min(index * 25, 500)}ms` });
 
 	// Score on the LEFT (SC-style)
 	el.createSpan({

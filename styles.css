@@ -1,3 +1,6 @@
+/* Status bar */
+.qmd-status-bar--hidden { display: none; }
+
 /* Search Modal */
 .qmd-search-modal {
 	width: min(760px, calc(100vw - 48px));
