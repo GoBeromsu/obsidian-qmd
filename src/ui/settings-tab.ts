@@ -13,7 +13,7 @@ export class QmdSettingTab extends PluginSettingTab {
     containerEl.empty();
     containerEl.classList.add('qmd-settings');
 
-    new Setting(containerEl).setName('QMD settings').setHeading();
+    new Setting(containerEl).setName('General').setHeading();
     containerEl.createEl('p', {
       text: this.plugin.describeBackend(),
       cls: 'qmd-settings-summary',
@@ -24,7 +24,7 @@ export class QmdSettingTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
-      .setName('QMD executable path')
+      .setName('Executable path')
       .setDesc('Leave blank, "auto", or "qmd" to auto-detect npm, bun, nvm, and common PATH installs.')
       .addText((text) => {
         text.setPlaceholder('auto');
@@ -139,7 +139,7 @@ export class QmdSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Show sync status bar item')
-      .setDesc('Display QMD status in the Obsidian status bar.')
+      .setDesc('Display sync status in the Obsidian status bar.')
       .addToggle((toggle) => {
         toggle.setValue(this.plugin.settings.showSyncStatusBar);
         toggle.onChange(async (value) => {

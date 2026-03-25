@@ -45,7 +45,7 @@ export class QmdRelatedView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'QMD related';
+		return 'Related notes';
 	}
 
 	getIcon(): string {

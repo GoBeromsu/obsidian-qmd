@@ -324,7 +324,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'sync-now',
-      name: 'Sync qmd now',
+      name: 'Sync now',
       callback: () => {
         void this.runSyncNow();
       },
@@ -332,7 +332,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'run-update',
-      name: 'Run qmd update',
+      name: 'Run update',
       callback: () => {
         void this.runUpdateCommand();
       },
@@ -340,7 +340,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'run-embed',
-      name: 'Run qmd embed',
+      name: 'Run embed',
       callback: () => {
         void this.runEmbedCommand();
       },
@@ -348,7 +348,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'rescan-collections',
-      name: 'Re-scan qmd collections',
+      name: 'Re-scan collections',
       callback: () => {
         void this.refreshBackendState(true);
       },
