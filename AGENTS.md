@@ -26,11 +26,14 @@ QMD — Obsidian plugin integrating a local QMD semantic search process into the
 
 | Directory | Purpose |
 |-----------|---------|
-| `src/domain/` | Business logic — NO obsidian imports |
-| `src/ui/` | Obsidian-dependent views, modals, settings, process adapter |
-| `src/types/` | Pure type definitions |
-| `src/utils/` | Pure utility functions |
-| `src/shared/` | Boiler-template synced files — DO NOT EDIT |
+| `src/` | Source layers intermediate node (see `src/AGENTS.md`) |
+| `src/domain/` | Business logic — NO obsidian imports (see `src/domain/AGENTS.md`) |
+| `src/ui/` | Obsidian-dependent views, modals, settings, process adapter (see `src/ui/AGENTS.md`) |
+| `src/types/` | Pure type definitions (see `src/types/AGENTS.md`) |
+| `src/utils/` | Pure utility functions (see `src/utils/AGENTS.md`) |
+| `src/shared/` | Boiler-template synced files — DO NOT EDIT (see `src/shared/AGENTS.md`) |
+| `tooling/shared/` | Canonical eslint/tsconfig config (see `tooling/shared/AGENTS.md`) |
+| `tooling/sync/` | Sync engine (see `tooling/sync/AGENTS.md`) |
 
 ## For AI Agents
 
