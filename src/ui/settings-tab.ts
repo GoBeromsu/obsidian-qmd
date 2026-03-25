@@ -13,7 +13,7 @@ export class QmdSettingTab extends PluginSettingTab {
     containerEl.empty();
     containerEl.classList.add('qmd-settings');
 
-    containerEl.createEl('h2', { text: 'QMD Settings' });
+    new Setting(containerEl).setHeading().setName('QMD settings');
     containerEl.createEl('p', {
       text: this.plugin.describeBackend(),
       cls: 'qmd-settings-summary',
