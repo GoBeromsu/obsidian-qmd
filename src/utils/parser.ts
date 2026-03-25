@@ -67,13 +67,16 @@ export function parseSearchResults(stdout: string): QmdSearchResult[] {
 		throw new Error('Unexpected qmd search result payload.');
 	}
 
-	return parsed.map((item) => ({
-		docid: String((item as Record<string, unknown>).docid ?? ''),
-		score: Number((item as Record<string, unknown>).score ?? 0),
-		file: String((item as Record<string, unknown>).file ?? ''),
-		title: String((item as Record<string, unknown>).title ?? ''),
-		snippet: String((item as Record<string, unknown>).snippet ?? ''),
-	}));
+	return parsed.map((item) => {
+		const row = item as Record<string, unknown>;
+		return {
+			docid: typeof row.docid === 'string' ? row.docid : '',
+			score: typeof row.score === 'number' ? row.score : Number(row.score ?? 0),
+			file: typeof row.file === 'string' ? row.file : '',
+			title: typeof row.title === 'string' ? row.title : '',
+			snippet: typeof row.snippet === 'string' ? row.snippet : '',
+		};
+	});
 }
 
 function parseVirtualPath(value: string): { collectionName: string; relativePath: string } | null {
