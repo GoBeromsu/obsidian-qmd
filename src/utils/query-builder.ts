@@ -33,7 +33,7 @@ export function buildRelatedQuerySource(
 	metadata?: NoteMetadata | null,
 ): RelatedQuerySource {
 	const rawTitle = filePath.split('/').pop()?.replace(/\.md$/, '') ?? filePath;
-	const frontmatter = metadata?.frontmatter as Record<string, unknown> | undefined;
+	const frontmatter = metadata?.frontmatter;
 	const aliasValues = unique(asArray(frontmatter?.aliases), 6);
 	const tagValues = unique([
 		...asArray(frontmatter?.tags),

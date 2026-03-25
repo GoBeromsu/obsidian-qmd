@@ -327,7 +327,7 @@ export class QmdSearchModal extends Modal {
 		});
 	}
 
-	private async submitCurrentQuery(): Promise<void> {
+	private submitCurrentQuery(): void {
 		const setupMessage = this.plugin.getSetupMessage();
 		if (setupMessage) {
 			this.plugin.notices.show('setup_error', { message: setupMessage });

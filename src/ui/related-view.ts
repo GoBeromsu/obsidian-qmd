@@ -45,7 +45,7 @@ export class QmdRelatedView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'QMD Related';
+		return 'QMD related';
 	}
 
 	getIcon(): string {
@@ -66,12 +66,13 @@ export class QmdRelatedView extends ItemView {
 		await this.renderView();
 	}
 
-	async onClose(): Promise<void> {
+	onClose(): Promise<void> {
 		if (this.fileOpenTimer) {
 			window.clearTimeout(this.fileOpenTimer);
 			this.fileOpenTimer = null;
 		}
 		this.container?.empty();
+		return Promise.resolve();
 	}
 
 	async renderView(force = false): Promise<void> {

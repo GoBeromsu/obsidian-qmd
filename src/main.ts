@@ -302,13 +302,13 @@ export default class QmdPlugin extends Plugin {
   private registerCommands(): void {
     this.addCommand({
       id: 'open-search',
-      name: 'QMD: Open search',
+      name: 'Open search',
       callback: () => QmdSearchModal.open(this, this.getActiveEditorSelection()),
     });
 
     this.addCommand({
       id: 'open-related-notes',
-      name: 'QMD: Open related notes',
+      name: 'Open related notes',
       callback: () => {
         void QmdRelatedView.open(this.app.workspace);
       },
@@ -316,7 +316,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'refresh-related-notes',
-      name: 'QMD: Refresh related notes',
+      name: 'Refresh related notes',
       callback: () => {
         void this.refreshRelatedView();
       },
@@ -324,7 +324,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'sync-now',
-      name: 'QMD: Sync qmd now',
+      name: 'Sync qmd now',
       callback: () => {
         void this.runSyncNow();
       },
@@ -332,7 +332,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'run-update',
-      name: 'QMD: Run qmd update',
+      name: 'Run qmd update',
       callback: () => {
         void this.runUpdateCommand();
       },
@@ -340,7 +340,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'run-embed',
-      name: 'QMD: Run qmd embed',
+      name: 'Run qmd embed',
       callback: () => {
         void this.runEmbedCommand();
       },
@@ -348,7 +348,7 @@ export default class QmdPlugin extends Plugin {
 
     this.addCommand({
       id: 'rescan-collections',
-      name: 'QMD: Re-scan qmd collections',
+      name: 'Re-scan qmd collections',
       callback: () => {
         void this.refreshBackendState(true);
       },
