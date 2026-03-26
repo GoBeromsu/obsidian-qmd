@@ -194,7 +194,7 @@ export class QmdSearchModal extends Modal {
 	private cycleMode(delta: number): void {
 		const currentIndex = SEARCH_MODE_ORDER.indexOf(this.mode);
 		const nextIndex = (currentIndex + delta + SEARCH_MODE_ORDER.length) % SEARCH_MODE_ORDER.length;
-		this.setMode(SEARCH_MODE_ORDER[nextIndex]);
+		this.setMode(SEARCH_MODE_ORDER[nextIndex]!);
 	}
 
 	private showModeMenu(): void {

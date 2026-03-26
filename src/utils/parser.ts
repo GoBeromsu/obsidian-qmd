@@ -23,7 +23,7 @@ export function parseCollectionList(stdout: string): string[] {
 			continue;
 		}
 
-		names.push(match[1].trim());
+		names.push(match[1]!.trim());
 	}
 
 	return names;
@@ -86,8 +86,8 @@ function parseVirtualPath(value: string): { collectionName: string; relativePath
 	}
 
 	return {
-		collectionName: match[1],
-		relativePath: match[2],
+		collectionName: match[1]!,
+		relativePath: match[2]!,
 	};
 }
 
@@ -155,7 +155,7 @@ export function validateStructuredQueryDocument(input: string): { valid: boolean
 			return { valid: false, error: 'Each line must start with lex:, vec:, hyde:, or intent:.' };
 		}
 
-		const prefix = match[1].toLowerCase();
+		const prefix = match[1]!.toLowerCase();
 		const text = line.slice(match[0].length).trim();
 		if (!text) {
 			return { valid: false, error: `${prefix}: lines must include text.` };

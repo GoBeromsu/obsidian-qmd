@@ -53,7 +53,7 @@ export class QmdRelatedView extends ItemView {
 	}
 
 	async onOpen(): Promise<void> {
-		this.containerEl.children[1].empty();
+		this.containerEl.children[1]!.empty();
 		this.container = this.containerEl.children[1] as HTMLDivElement;
 		this.container.classList.add('qmd-related-view');
 

@@ -1,0 +1,171 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1774407612628,
+  "projectRoot": "/Users/beomsu/Documents/Dev/Obsidian-Plugins/obsidian-qmd",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "esbuild",
+        "version": "0.25.0",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "2.0.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "pnpm build",
+    "testCommand": "pnpm test",
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "dev": "node scripts/dev.mjs",
+      "dev:build": "node esbuild.config.mjs",
+      "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run",
+      "ci": "pnpm run build && pnpm run lint && pnpm run test",
+      "prepare": "husky",
+      "version": "node scripts/version.mjs",
+      "postversion": "git push && git push --tags",
+      "release:patch": "node scripts/release.mjs patch",
+      "release:minor": "node scripts/release.mjs minor",
+      "release:major": "node scripts/release.mjs major"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase/PascalCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "scripts",
+      "src",
+      "test"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 5,
+      "lastAccessed": 1774407612609,
+      "keyFiles": [
+        "dev.mjs",
+        "release-notes.mjs",
+        "release.mjs",
+        "sync-to-plugins.mjs",
+        "version.mjs"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 1,
+      "lastAccessed": 1774407612610,
+      "keyFiles": [
+        "main.ts"
+      ]
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 0,
+      "lastAccessed": 1774407612612,
+      "keyFiles": []
+    },
+    "tooling": {
+      "path": "tooling",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1774407612613,
+      "keyFiles": []
+    },
+    "src/types": {
+      "path": "src/types",
+      "purpose": "Type definitions",
+      "fileCount": 1,
+      "lastAccessed": 1774407612613,
+      "keyFiles": [
+        "index.ts"
+      ]
+    },
+    "src/utils": {
+      "path": "src/utils",
+      "purpose": "Utility functions",
+      "fileCount": 2,
+      "lastAccessed": 1774407612614,
+      "keyFiles": [
+        "parser.ts",
+        "query-builder.ts"
+      ]
+    },
+    "test/mocks": {
+      "path": "test/mocks",
+      "purpose": "Mock data",
+      "fileCount": 1,
+      "lastAccessed": 1774407612614,
+      "keyFiles": [
+        "obsidian.ts"
+      ]
+    },
+    "test/utils": {
+      "path": "test/utils",
+      "purpose": "Utility functions",
+      "fileCount": 2,
+      "lastAccessed": 1774407612614,
+      "keyFiles": [
+        "parser.test.ts",
+        "query-builder.test.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/ui/settings-tab.ts",
+      "accessCount": 2,
+      "lastAccessed": 1774438022529,
+      "type": "file"
+    },
+    {
+      "path": "src/utils/parser.ts",
+      "accessCount": 1,
+      "lastAccessed": 1774437992739,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
