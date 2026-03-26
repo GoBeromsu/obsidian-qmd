@@ -107,7 +107,7 @@ describe('QmdProcessAdapter', () => {
 
   it('reports configured and resolved paths when an explicit binary is missing', async () => {
     const execFileAsync = vi.fn(async (_file: string, _args: string[]) => {
-      const error = new Error('spawn ENOENT') as NodeJS.ErrnoException & { code?: string };
+      const error = new Error('spawn ENOENT') as Error & { code?: string };
       error.code = 'ENOENT';
       throw error;
     });

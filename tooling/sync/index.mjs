@@ -309,6 +309,7 @@ export async function buildSyncPlan({ templateRoot, targetRoot }) {
   };
 }
 
+/** @param {import('./types.js').SyncPlan} plan @param {{ dryRun?: boolean, onLog?: (line: string) => void }} [options] */
 export async function applySyncPlan(plan, { dryRun = false, onLog = () => {} } = {}) {
   if (plan.operations.length === 0) {
     onLog(`UNCHANGED ${plan.targetName}`);

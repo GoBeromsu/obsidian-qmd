@@ -14,7 +14,7 @@ import {
 type ExecFileAsync = (
   file: string,
   args: string[],
-  options: { encoding: 'utf8'; maxBuffer: number; cwd?: string; env?: NodeJS.ProcessEnv },
+  options: { encoding: 'utf8'; maxBuffer: number; cwd?: string; env?: Record<string, string | undefined> },
 ) => Promise<{ stdout: string; stderr: string }>;
 
 const defaultExecFile = promisify(execFile) as ExecFileAsync;
@@ -166,15 +166,15 @@ export class QmdProcessAdapter {
     }
   }
 
-  private async buildEnvWithNode(executablePath: string): Promise<NodeJS.ProcessEnv> {
+  private async buildEnvWithNode(executablePath: string): Promise<Record<string, string | undefined>> {
     try {
       const nodePath = await this.resolveNodeRuntime(executablePath);
       const nodeBinDir = path.dirname(nodePath);
       const currentPath = process.env.PATH ?? '';
-      if (currentPath.split(':').includes(nodeBinDir)) return process.env;
+      if (currentPath.split(':').includes(nodeBinDir)) return { ...process.env };
       return { ...process.env, PATH: `${nodeBinDir}:${currentPath}` };
     } catch {
-      return process.env;
+      return { ...process.env };
     }
   }
 
@@ -358,7 +358,7 @@ export class QmdProcessAdapter {
   }
 
   private normalizeError(error: unknown, resolvedExecutablePath: string, launchedFile: string): Error {
-    const value = error as NodeJS.ErrnoException & { stderr?: string; stdout?: string; code?: string | number };
+    const value = error as Error & { code?: string | number; errno?: number; stderr?: string; stdout?: string };
 
     if (value?.code === 'ENOENT') {
       const configured = this.executablePath.trim() || 'qmd';
