@@ -12,6 +12,8 @@
     "isolatedModules": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+    "strictBindCallApply": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "lib": [
