@@ -26,5 +26,4 @@ test-results.xml
 # Generated/temporary
 coverage/
 .openchrome/
-.omc/sessions/
-.omc/state/
+.omc/
