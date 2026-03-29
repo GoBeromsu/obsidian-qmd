@@ -22,3 +22,9 @@ data.json
 .DS_Store
 test-results.xml
 .claude/
+
+# Generated/temporary
+coverage/
+.openchrome/
+.omc/sessions/
+.omc/state/

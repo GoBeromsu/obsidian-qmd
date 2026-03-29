@@ -18,7 +18,7 @@ describe('QmdProcessAdapter', () => {
   });
 
   it('resolves the collection whose path matches the current vault', async () => {
-    const execFileAsync = vi.fn(async (_file: string, args: string[]) => {
+    const execFileAsync = vi.fn((_file: string, args: string[]) => {
       if (args[0] === '--help') {
         return { stdout: '', stderr: '' };
       }
@@ -72,7 +72,7 @@ describe('QmdProcessAdapter', () => {
     chmodSync(qmdPath, 0o755);
     chmodSync(nodePath, 0o755);
 
-    const execFileAsync = vi.fn(async (file: string, args: string[]) => {
+    const execFileAsync = vi.fn((file: string, args: string[]) => {
       if ((file === '/bin/zsh' || file === '/bin/bash') && args.includes('-lc')) {
         return {
           stdout: `${qmdPath}\n`,
@@ -106,7 +106,7 @@ describe('QmdProcessAdapter', () => {
   });
 
   it('reports configured and resolved paths when an explicit binary is missing', async () => {
-    const execFileAsync = vi.fn(async (_file: string, _args: string[]) => {
+    const execFileAsync = vi.fn((_file: string, _args: string[]) => {
       const error = new Error('spawn ENOENT') as Error & { code?: string };
       error.code = 'ENOENT';
       throw error;

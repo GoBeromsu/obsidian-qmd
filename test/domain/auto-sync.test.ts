@@ -12,11 +12,13 @@ describe('AutoSyncController', () => {
     const calls: string[] = [];
     const controller = new AutoSyncController(100, {
       shouldRun: () => true,
-      runUpdate: async () => {
+      runUpdate: () => {
         calls.push('update');
+        return Promise.resolve();
       },
-      runEmbed: async () => {
+      runEmbed: () => {
         calls.push('embed');
+        return Promise.resolve();
       },
     });
 
@@ -45,8 +47,9 @@ describe('AutoSyncController', () => {
           });
         }
       },
-      runEmbed: async () => {
+      runEmbed: () => {
         calls.push('embed');
+        return Promise.resolve();
       },
     });
 
@@ -65,11 +68,10 @@ describe('AutoSyncController', () => {
     const phases: string[] = [];
     const controller = new AutoSyncController(25, {
       shouldRun: () => true,
-      runUpdate: async () => {
-        throw new Error('update failed');
-      },
-      runEmbed: async () => {
+      runUpdate: () => Promise.reject(new Error('update failed')),
+      runEmbed: () => {
         phases.push('embed');
+        return Promise.resolve();
       },
       onPhaseChange: (phase) => {
         phases.push(phase);
