@@ -56,6 +56,7 @@ export default class QmdPlugin extends Plugin {
     await this.loadSettings();
 
     this.adapter = new QmdProcessAdapter(this.settings.qmdExecutablePath);
+    this.adapter.setWorkingDirectory(this.getVaultPath());
     this.autoSync = new AutoSyncController(this.settings.autoSyncDebounceMs, {
       shouldRun: () => this.canAutoSync(),
       runUpdate: () => this.adapter.runUpdate(),
@@ -161,12 +162,14 @@ export default class QmdPlugin extends Plugin {
   }
 
   async refreshBackendState(showNotice = false): Promise<void> {
+    const vaultPath = this.getVaultPath();
+
+    this.adapter.setWorkingDirectory(vaultPath);
     this.adapter.setExecutablePath(this.settings.qmdExecutablePath.trim() || DEFAULT_SETTINGS.qmdExecutablePath);
 
     try {
       await this.adapter.checkBinary();
 
-      const vaultPath = this.getVaultPath();
       if (!vaultPath) {
         this.collections = [];
         this.activeCollection = null;

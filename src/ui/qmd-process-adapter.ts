@@ -24,6 +24,7 @@ const QMD_PACKAGE_SUBPATH = path.join('@tobilu', 'qmd', 'dist', 'qmd.js');
 export class QmdProcessAdapter {
   private resolvedExecutablePath: string | null = null;
   private resolvedNodePath: string | null = null;
+  private workingDirectory: string | null = null;
 
   constructor(
     private executablePath: string,
@@ -34,6 +35,10 @@ export class QmdProcessAdapter {
     this.executablePath = value;
     this.resolvedExecutablePath = null;
     this.resolvedNodePath = null;
+  }
+
+  setWorkingDirectory(value: string | null): void {
+    this.workingDirectory = value?.trim() ? normalizeFsPath(value) : null;
   }
 
   getResolvedExecutablePath(): string | null {
@@ -154,27 +159,34 @@ export class QmdProcessAdapter {
   private async run(args: string[]): Promise<{ stdout: string; stderr: string }> {
     const executable = await this.resolveExecutablePath();
     const invocation = await this.resolveInvocation(executable, args);
+    const cwd = this.getWorkingDirectory();
 
     try {
       return await this.execFileAsync(invocation.file, invocation.args, {
         encoding: 'utf8',
         maxBuffer: 10 * 1024 * 1024,
-        env: await this.buildEnvWithNode(executable),
+        cwd,
+        env: await this.buildEnvWithNode(executable, cwd),
       });
     } catch (error) {
       throw this.normalizeError(error, executable, invocation.file);
     }
   }
 
-  private async buildEnvWithNode(executablePath: string): Promise<Record<string, string | undefined>> {
+  private async buildEnvWithNode(
+    executablePath: string,
+    cwd: string,
+  ): Promise<Record<string, string | undefined>> {
+    const env = { ...process.env, PWD: cwd };
+
     try {
       const nodePath = await this.resolveNodeRuntime(executablePath);
       const nodeBinDir = path.dirname(nodePath);
       const currentPath = process.env.PATH ?? '';
-      if (currentPath.split(':').includes(nodeBinDir)) return { ...process.env };
-      return { ...process.env, PATH: `${nodeBinDir}:${currentPath}` };
+      if (currentPath.split(':').includes(nodeBinDir)) return env;
+      return { ...env, PATH: `${nodeBinDir}:${currentPath}` };
     } catch {
-      return { ...process.env };
+      return env;
     }
   }
 
@@ -234,6 +246,9 @@ export class QmdProcessAdapter {
   }
 
   private async resolveFromLoginShell(commandName: string): Promise<string | null> {
+    const cwd = this.getWorkingDirectory();
+    const env = { ...process.env, PWD: cwd };
+
     for (const shell of SHELLS) {
       if (!existsSync(shell)) {
         continue;
@@ -246,6 +261,8 @@ export class QmdProcessAdapter {
           {
             encoding: 'utf8',
             maxBuffer: 1024 * 1024,
+            cwd,
+            env,
           },
         );
 
@@ -351,6 +368,10 @@ export class QmdProcessAdapter {
   private isAutoDetectPath(value: string): boolean {
     const normalized = value.trim().toLowerCase();
     return normalized === '' || normalized === 'qmd' || normalized === 'auto';
+  }
+
+  private getWorkingDirectory(): string {
+    return this.workingDirectory ?? homedir();
   }
 
   private escapeShellArg(value: string): string {

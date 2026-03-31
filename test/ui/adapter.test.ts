@@ -87,6 +87,7 @@ describe('QmdProcessAdapter', () => {
     });
 
     const adapter = new QmdProcessAdapter('qmd', execFileAsync as never);
+    adapter.setWorkingDirectory('/Users/test/Vault');
     await adapter.keywordSearch('search terms', 'obsidian', 5);
 
     expect(execFileAsync).toHaveBeenLastCalledWith(
@@ -101,7 +102,13 @@ describe('QmdProcessAdapter', () => {
         '-n',
         '5',
       ],
-      expect.objectContaining({ encoding: 'utf8' }),
+      expect.objectContaining({
+        encoding: 'utf8',
+        cwd: '/Users/test/Vault',
+        env: expect.objectContaining({
+          PWD: '/Users/test/Vault',
+        }),
+      }),
     );
   });
 
