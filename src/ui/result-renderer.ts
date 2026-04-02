@@ -6,15 +6,15 @@ import { extractQueryTerms } from '../utils/parser';
 import type { QmdOpenTarget, QmdSearchResult } from '../types';
 import { showResultContextMenu } from './result-actions';
 
-export type ScoreTier = 'high' | 'medium' | 'low';
+type ScoreTier = 'high' | 'medium' | 'low';
 
-export function scoreTier(score: number): ScoreTier {
+function scoreTier(score: number): ScoreTier {
 	if (score >= 0.85) return 'high';
 	if (score >= 0.7) return 'medium';
 	return 'low';
 }
 
-export function formatBreadcrumb(path: string): string {
+function formatBreadcrumb(path: string): string {
 	const parts = path.split('/');
 	parts.pop();
 	return parts.length > 0 ? parts.join(' > ') : '';
