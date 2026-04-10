@@ -31,7 +31,6 @@ QMD — Obsidian plugin integrating a local QMD semantic search process into the
 | `src/ui/` | Obsidian-dependent views, modals, settings, process adapter (see `src/ui/AGENTS.md`) |
 | `src/types/` | Pure type definitions (see `src/types/AGENTS.md`) |
 | `src/utils/` | Pure utility functions (see `src/utils/AGENTS.md`) |
-| `src/shared/` | Boiler-template synced files — DO NOT EDIT (see `src/shared/AGENTS.md`) |
 | `tooling/shared/` | Canonical eslint/tsconfig config (see `tooling/shared/AGENTS.md`) |
 | `tooling/sync/` | Sync engine (see `tooling/sync/AGENTS.md`) |
 
@@ -41,7 +40,7 @@ QMD — Obsidian plugin integrating a local QMD semantic search process into the
 - 4-layer architecture: `domain/` must not import `obsidian`
 - `qmd-process-adapter.ts` is the only file that spawns child processes — keep I/O boundary here
 - `path-resolver.ts` handles the vault-relative → absolute path translation; always use it at the boundary
-- `src/shared/` synced from `obsidian-boiler-template` — never edit directly
+- repo implementation stays local inside `src/domain/`, `src/ui/`, `src/types/`, and `src/utils/`
 - `isDesktopOnly: true` — Node.js child_process APIs are safe to use
 
 ### Testing Requirements
@@ -52,13 +51,13 @@ pnpm run build    # tsc type-check + esbuild
 ```
 
 ### Common Patterns
-- Auto-sync uses a debounce controller from `src/shared/` — do not add raw setTimeout
+- Auto-sync debounce behavior lives in `src/domain/auto-sync.ts` — keep the runtime contract local to this repo
 - Results rendered with `result-renderer.ts` — extend there, not in individual views
 
 ## Dependencies
 
 ### Internal
-- `obsidian-boiler-template` — source of truth for `src/shared/`
+- workspace contracts/harness docs may be shared, but plugin implementation stays repo-local
 
 ### External
 - `obsidian` — Obsidian Plugin API

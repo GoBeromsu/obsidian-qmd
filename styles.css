@@ -1,6 +1,59 @@
 /* Status bar */
 .qmd-status-bar--hidden { display: none; }
 
+/* Plugin notices */
+.plugin-notice {
+	display: grid;
+	gap: 6px;
+}
+
+.plugin-notice-head {
+	margin: 0;
+	font-size: var(--font-smallest);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.plugin-notice-content {
+	margin: 0;
+	line-height: 1.45;
+	color: var(--text-normal);
+}
+
+.plugin-notice-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.plugin-notice-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	padding: 4px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 999px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	cursor: pointer;
+}
+
+.plugin-notice-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.plugin-notice-btn--mute {
+	padding-inline: 8px;
+}
+
+.plugin-notice-btn--mute svg {
+	width: 14px;
+	height: 14px;
+}
+
 /* Search Modal */
 .qmd-search-modal {
 	width: min(760px, calc(100vw - 48px));

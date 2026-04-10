@@ -51,7 +51,15 @@ export class Setting {
   addToggle(_cb: any) { return this }
 }
 export class Notice {
-  constructor(_msg: string, _timeout?: number) {}
+  message: unknown
+  timeout?: number
+  hidden = false
+  constructor(msg: unknown, timeout?: number) {
+    this.message = msg
+    this.timeout = timeout
+  }
+  setMessage(msg: unknown) { this.message = msg }
+  hide() { this.hidden = true }
 }
 export class Menu {
   addItem(cb: (item: any) => any) { cb({ setTitle() { return this }, setIcon() { return this }, onClick() { return this } }); return this }
@@ -74,6 +82,8 @@ export class WorkspaceLeaf {
   view: any
   async setViewState(_state: any) {}
 }
-export function setIcon(_el: HTMLElement, _icon: string) {}
+export function setIcon(el: HTMLElement, icon: string) {
+  el.setAttribute('data-icon', icon)
+}
 export declare class App {}
 export const Platform = { isDesktop: true, isMobile: false }

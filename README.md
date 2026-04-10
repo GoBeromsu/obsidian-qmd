@@ -4,6 +4,8 @@ Local semantic search for Obsidian.
 
 QMD bridges Obsidian with a local QMD daemon to deliver fast, privacy-first semantic search across your vault. All processing happens on your machine—no data leaves your device. Search by meaning instead of keywords, discover related notes automatically, and keep your notes indexed in real time.
 
+This repo keeps plugin implementation local; shared family assets are limited to contracts, docs, and harness/tooling skeletons.
+
 ## Features
 
 - **Local semantic search** — all processing runs on your machine; zero cloud dependencies
@@ -132,14 +134,12 @@ pnpm run ci        # build + lint + test
 obsidian-qmd/
 ├── src/
 │   ├── main.ts              # Plugin entry point
-│   ├── settings.ts          # Settings and configuration
-│   ├── types.ts             # TypeScript type definitions
-│   ├── qmd/                 # QMD CLI adapter and logic
-│   ├── ui/                  # Search modal, settings, result actions
-│   ├── views/               # Related notes sidebar view
-│   └── shared/              # Shared utilities (synced from boiler)
+│   ├── domain/             # Auto-sync orchestration, settings, path resolution
+│   ├── ui/                 # Search modal, related view, settings, notices, process adapter
+│   ├── types/              # TypeScript type definitions
+│   └── utils/              # Pure parsing and query helpers
 ├── scripts/                 # Build and release scripts
-├── boiler.config.mjs        # Plugin configuration
+├── boiler.config.mjs        # Repo-specific harness/release configuration
 └── manifest.json            # Obsidian plugin manifest
 ```
 

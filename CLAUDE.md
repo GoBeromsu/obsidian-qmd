@@ -1,63 +1,31 @@
-# CLAUDE.md — Obsidian Boiler Template
+# obsidian-qmd
 
-> Git strategy, branch naming, commit convention, and release management are defined in the **root CLAUDE.md**. This file covers template-specific details only.
+Obsidian plugin for local QMD search, related notes, and auto-sync.
 
-## Overview
+## Repo posture
 
-Source-of-truth seed template for new Obsidian plugins. Changes here get propagated to all downstream plugins via the `obsidian-propagate` skill or `pnpm sync:plugins`.
+- Keep plugin implementation local to this repo.
+- Shared family assets may cover contracts, docs, and harness skeletons only.
+- Do not reintroduce a `src/shared/` implementation layer by default.
 
-## Build Commands
+## Commands
 
-```bash
-pnpm dev            # vault selection + esbuild watch + hot reload
-pnpm dev:build      # esbuild build (no vault deploy)
-pnpm build          # tsc type-check + production esbuild build
-pnpm test           # Vitest unit tests
-pnpm lint           # ESLint
-pnpm lint:fix       # ESLint with auto-fix
-pnpm run ci         # build + lint + test
-pnpm release:patch  # run CI → patch bump → auto-push tag
-pnpm release:minor  # run CI → minor bump → auto-push tag
-pnpm release:major  # run CI → major bump → auto-push tag
-pnpm sync:plugins   # propagate template changes to downstream plugins
-```
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Build/watch and hot reload into an Obsidian vault |
+| `pnpm build` | Type-check and production bundle |
+| `pnpm lint` | ESLint |
+| `pnpm test` | Vitest |
+| `pnpm run ci` | Build + lint + test |
+| `pnpm release:patch` | Run CI, bump version, push commit/tag |
 
-### sync:plugins options
+## Release flow
 
-```bash
-node scripts/sync-to-plugins.mjs --dry-run                          # preview without writing
-node scripts/sync-to-plugins.mjs --targets plugin-a,plugin-b        # sync specific targets only
-```
+`pnpm release:patch|minor|major` handles the supported release path:
 
-Synced artifacts: `scripts/dev.mjs`, `scripts/version.mjs`, `.github/workflows/ci.yml`, `.github/workflows/release.yml`.
+1. `pnpm run ci`
+2. `pnpm version <level>` updates `package.json`, `manifest.json`, and `versions.json`
+3. `postversion` pushes the commit and tag
+4. GitHub Actions publishes the release artifacts
 
-## Role
-
-This repo serves as the canonical template. The workflow is:
-1. Prove a new pattern here first
-2. Propagate to downstream plugins via `sync:plugins` or the `obsidian-propagate` skill
-3. Never diverge downstream plugins from this template without deliberate reason
-
-## Project Layout
-
-```
-src/                  # Plugin source (entry: main.ts)
-scripts/              # dev.mjs, version.mjs, sync-to-plugins.mjs
-tooling/shared/       # Canonical dev.mjs & version.mjs (synced to plugins)
-tooling/sync/         # Sync engine & workflow renderers
-boiler.config.mjs     # Per-repo config (dev deploy, version staging, CI, release)
-```
-
-## Release
-
-1. `pnpm run ci` — MUST pass (build + lint + test)
-2. `pnpm release:patch|minor|major` — run CI, version bump, auto-push tag (via `postversion`)
-3. GitHub Actions handles CI + Release workflows (`ci.yml`, `release.yml`)
-
-**DENIED by settings.json:** `git tag`, `git push --tags`, `gh release` — only `pnpm release:*` is allowed.
-
-## Gotchas
-
-- Default branch is `master` (not `main`)
-- Tab indentation, width 4 (enforced by `.editorconfig`)
-- `boiler.config.mjs` defines per-repo values — each downstream plugin has its own copy
+Prefer the scripted release flow over manual tags or ad-hoc packaging.

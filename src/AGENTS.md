@@ -19,7 +19,6 @@ Root composition layer wiring all domain, UI, types, utils, and shared modules i
 - `ui/` — Obsidian-dependent UI modules (search modal, related view, settings tab, process adapter)
 - `types/` — Pure TypeScript type definitions
 - `utils/` — Stateless utility functions (parsing, query building)
-- `shared/` — Synced from boiler-template (logger, notices, debounce controller)
 
 ## For AI Agents
 
@@ -32,7 +31,7 @@ Root composition layer wiring all domain, UI, types, utils, and shared modules i
 ## Dependencies
 
 - `domain/`: No external deps
-- `ui/`: Depends on `obsidian` API, `domain/`, `types/`, `utils/`, `shared/`
+- `ui/`: Depends on `obsidian` API, `domain/`, `types/`, and `utils/`
 - `main.ts`: Imports from all layers (composition root)
 
 ## Architecture Notes
@@ -41,8 +40,7 @@ Root composition layer wiring all domain, UI, types, utils, and shared modules i
 ```
 utils/ ──┐
 types/ ──┼── domain/ ── ui/ ── main.ts
-shared/ ─┘               │
-                          └── shared/
+         └───────────────────┘
 ```
 
 **Key patterns:**

@@ -16,8 +16,9 @@ import { QmdSearchModal } from './ui/search-modal';
 import { QmdSettingTab } from './ui/settings-tab';
 import { buildRelatedQueryDocument, buildRelatedQuerySource } from './utils/query-builder';
 import { toVaultRelativePath } from './utils/parser';
-import { PluginLogger } from './shared/plugin-logger';
-import { PluginNotices, type NoticeCatalog, type PluginNoticesHost } from './shared/plugin-notices';
+import { PluginLogger } from './ui/plugin-logger';
+import { PluginNotices } from './ui/plugin-notices';
+import type { NoticeCatalog, PluginNoticesHost } from './ui/plugin-notice-types';
 
 const NOTICE_CATALOG: NoticeCatalog = {
   backend_status:         { template: '{{ message }}', timeout: 5000 },

@@ -5,7 +5,7 @@
 
 ## Purpose
 
-User-facing UI layer with direct Obsidian API access. Implements search modal, related-notes view, settings tab, status bar, and QMD process adapter. Imports from domain/, types/, utils/, shared/, and obsidian.
+User-facing UI layer with direct Obsidian API access. Implements search modal, related-notes view, settings tab, status bar, QMD process adapter, and repo-local notice/logger helpers. Imports from domain/, types/, utils/, and obsidian.
 
 ## Key Files
 
@@ -29,7 +29,7 @@ User-facing UI layer with direct Obsidian API access. Implements search modal, r
 
 ## Dependencies
 
-- Imports from: `obsidian`, `domain/`, `types/`, `utils/`, `shared/`
+- Imports from: `obsidian`, `domain/`, `types/`, `utils/`
 - No reverse imports from ui/ back to domain/
 - Process adapter reads from utils/ parsers
 
