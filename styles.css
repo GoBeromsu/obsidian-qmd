@@ -167,8 +167,6 @@
 	border-radius: 6px;
 	cursor: pointer;
 	transition: background-color 100ms ease;
-	animation: qmd-fade-in 0.2s ease both;
-	animation-delay: var(--qmd-result-delay, 0ms);
 }
 .qmd-result-item:hover,
 .qmd-result-item:focus-visible {
@@ -312,8 +310,4 @@
 .qmd-search-instructions { justify-content: flex-start; flex-wrap: wrap; padding-top: 4px; gap: 10px; }
 
 /* Animations */
-@keyframes qmd-fade-in {
-	from { opacity: 0; transform: translateY(4px); }
-	to { opacity: 1; transform: translateY(0); }
-}
 @keyframes qmd-spin { to { transform: rotate(360deg); } }
