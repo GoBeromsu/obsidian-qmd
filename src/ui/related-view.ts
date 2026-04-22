@@ -1,4 +1,4 @@
-import { type HoverPopover, ItemView, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
+import { ButtonComponent, type HoverPopover, ItemView, TFile, WorkspaceLeaf, setIcon } from 'obsidian';
 import type QmdPlugin from '../main';
 import type { CachedRelatedResult, QmdSearchResult } from '../types';
 import { renderResultItem } from './result-renderer';
@@ -86,13 +86,26 @@ export class QmdRelatedView extends ItemView {
 		this.renderShell(activeFile);
 
 		if (!(activeFile instanceof TFile) || activeFile.extension !== 'md') {
-			this.renderEmpty('Open a markdown note to see related results.', 'file-text');
+			this.renderEmpty('Open a markdown note to see related results.', 'file-text', {
+				label: 'Refresh',
+				onClick: () => { void this.renderView(true); },
+			});
 			return;
 		}
 
 		const setupMessage = this.plugin.getSetupMessage();
 		if (setupMessage) {
-			this.renderEmpty(setupMessage, 'alert-circle');
+			this.renderEmpty(setupMessage, 'alert-circle', {
+				label: 'Open settings',
+				onClick: () => {
+					(this.app as typeof this.app & {
+						setting?: { open?: () => void; openTabById?: (id: string) => void };
+					}).setting?.open?.();
+					(this.app as typeof this.app & {
+						setting?: { open?: () => void; openTabById?: (id: string) => void };
+					}).setting?.openTabById?.(this.plugin.manifest.id);
+				},
+			});
 			return;
 		}
 
@@ -124,7 +137,10 @@ export class QmdRelatedView extends ItemView {
 
 			this.plugin.logger.error('Failed to find related notes', error);
 			this.renderShell(activeFile);
-			this.renderEmpty('Could not find related notes. Try refreshing.', 'alert-circle');
+			this.renderEmpty('Could not find related notes.', 'alert-circle', {
+				label: 'Refresh',
+				onClick: () => { void this.renderView(true); },
+			});
 		}
 	}
 
@@ -216,16 +232,29 @@ export class QmdRelatedView extends ItemView {
 		}
 	}
 
-	private renderEmpty(message: string, icon: string): void {
+	private renderEmpty(
+		message: string,
+		icon: string,
+		action?: { label: string; onClick: () => void },
+	): void {
 		const stateEl = this.container.createDiv({ cls: 'qmd-state' });
 		const iconEl = stateEl.createDiv({ cls: 'qmd-state-icon' });
 		setIcon(iconEl, icon);
 		stateEl.createEl('p', { cls: 'qmd-state-text', text: message });
+		if (action) {
+			new ButtonComponent(stateEl)
+				.setButtonText(action.label)
+				.setCta()
+				.onClick(action.onClick);
+		}
 	}
 
 	private renderResults(file: TFile, results: QmdSearchResult[]): void {
 		if (results.length === 0) {
-			this.renderEmpty(`No related notes for ${file.basename}.`, 'search-x');
+			this.renderEmpty(`No related notes for ${file.basename}.`, 'search-x', {
+				label: 'Refresh',
+				onClick: () => { void this.renderView(true); },
+			});
 			return;
 		}
 
