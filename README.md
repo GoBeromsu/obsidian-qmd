@@ -2,7 +2,7 @@
 
 Local QMD search, related notes, and autosync for your vault.
 
-![QMD search modal in Exact match (keyword) mode on a small sample vault: typing "coffee" and then "marathon" returns the matching note with the term highlighted. Semantic and hybrid modes are not shown.](https://raw.githubusercontent.com/Xia-Ataraxia/obsidian-qmd/main/docs/assets/demo.webp)
+![QMD search modal in Exact match (keyword) mode on a small sample vault: typing "coffee" and then "marathon" returns the matching note with the term highlighted. Semantic and hybrid modes are not shown.](https://raw.githubusercontent.com/GoBeromsu/obsidian-qmd/main/docs/assets/demo.webp)
 
 ## Features
 
@@ -26,7 +26,7 @@ Desktop only, Obsidian 1.13.0 or later.
 
 **Community plugins**: open Settings, Community plugins, Browse, search for "QMD", then Install and Enable.
 
-**Manual**: download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/Xia-Ataraxia/obsidian-qmd/releases/latest) into `<vault>/<configDir>/plugins/qmd/`, then enable the plugin. `<configDir>` is your vault's configuration folder (`.obsidian` by default).
+**Manual**: download `main.js`, `manifest.json` and `styles.css` from the [latest release](https://github.com/GoBeromsu/obsidian-qmd/releases/latest) into `<vault>/<configDir>/plugins/qmd/`, then enable the plugin. `<configDir>` is your vault's configuration folder (`.obsidian` by default).
 
 ## Disclosures
 
